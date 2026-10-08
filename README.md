@@ -2,7 +2,7 @@
 
 <img src="resources/icons/logo_banner.png" alt="SudoStrap" width="600" />
 
-# ⚡ SudoStrap
+#  SudoStrap
 
 **A modern FastFlags manager for Roblox on Linux**
 
