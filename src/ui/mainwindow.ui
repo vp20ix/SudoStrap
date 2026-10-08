@@ -1,0 +1,641 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry"><rect><x>0</x><y>0</y><width>1180</width><height>760</height></rect></property>
+  <property name="windowTitle"><string>SudoStrap</string></property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="rootLayout">
+    <property name="spacing"><number>0</number></property>
+    <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property>
+
+    <item>
+     <layout class="QHBoxLayout" name="mainLayout">
+      <property name="spacing"><number>0</number></property>
+      <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property>
+
+      <item>
+       <widget class="QWidget" name="sidebar" native="true">
+        <property name="minimumSize"><size><width>230</width><height>0</height></size></property>
+        <property name="maximumSize"><size><width>230</width><height>16777215</height></size></property>
+        <layout class="QVBoxLayout" name="sidebarLayout">
+         <property name="spacing"><number>4</number></property>
+         <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>14</number></property>
+
+         <item><widget class="QLabel" name="appTitle"><property name="text"><string>⚡  SudoStrap</string></property></widget></item>
+         <item><widget class="QLabel" name="navSectionLabel"><property name="text"><string>WORKSPACE</string></property></widget></item>
+         <item><widget class="QPushButton" name="btnPerformance"><property name="text"><string>⚡   Performance</string></property><property name="checkable"><bool>true</bool></property><property name="checked"><bool>true</bool></property><property name="autoExclusive"><bool>true</bool></property></widget></item>
+         <item><widget class="QPushButton" name="btnGraphics"><property name="text"><string>🎨   Graphics</string></property><property name="checkable"><bool>true</bool></property><property name="autoExclusive"><bool>true</bool></property></widget></item>
+         <item><widget class="QPushButton" name="btnFastFlags"><property name="text"><string>🔧   FastFlags</string></property><property name="checkable"><bool>true</bool></property><property name="autoExclusive"><bool>true</bool></property></widget></item>
+         <item><widget class="QPushButton" name="btnSettings"><property name="text"><string>⚙️   Settings</string></property><property name="checkable"><bool>true</bool></property><property name="autoExclusive"><bool>true</bool></property></widget></item>
+         <item><widget class="QPushButton" name="btnAbout"><property name="text"><string>ℹ️   About</string></property><property name="checkable"><bool>true</bool></property><property name="autoExclusive"><bool>true</bool></property></widget></item>
+         <item><spacer name="sidebarSpacer"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property></spacer></item>
+         <item><widget class="QLabel" name="statusChip"><property name="text"><string>●  Sober Ready</string></property></widget></item>
+         <item><widget class="QPushButton" name="launchButton"><property name="text"><string>▶   Launch Sober</string></property></widget></item>
+        </layout>
+       </widget>
+      </item>
+
+      <item>
+       <widget class="QStackedWidget" name="pagesStack">
+        <property name="currentIndex"><number>0</number></property>
+
+        <!-- ============ PERFORMANCE ============ -->
+        <widget class="QWidget" name="pagePerformance">
+         <layout class="QVBoxLayout" name="perfOuter">
+          <property name="spacing"><number>0</number></property>
+          <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property>
+          <item>
+           <widget class="QScrollArea" name="perfScroll">
+            <property name="widgetResizable"><bool>true</bool></property>
+            <property name="frameShape"><enum>QFrame::NoFrame</enum></property>
+            <widget class="QWidget" name="perfContent">
+             <layout class="QVBoxLayout" name="perfLayout">
+              <property name="spacing"><number>10</number></property>
+              <property name="leftMargin"><number>40</number></property><property name="topMargin"><number>36</number></property><property name="rightMargin"><number>40</number></property><property name="bottomMargin"><number>36</number></property>
+
+              <item><widget class="QLabel" name="perfEyebrow"><property name="text"><string>PERFORMANCE</string></property></widget></item>
+              <item><widget class="QLabel" name="perfTitle"><property name="text"><string>Tune Roblox Performance</string></property></widget></item>
+              <item><widget class="QLabel" name="perfSubtitle"><property name="text"><string>Get more FPS without sacrificing stability</string></property></widget></item>
+              <item><spacer name="perfSp1"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property></spacer></item>
+
+              <item>
+               <widget class="QFrame" name="row1">
+                <layout class="QHBoxLayout" name="row1L">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="icon1"><property name="text"><string>⚡</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="text1"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="t1"><property name="text"><string>Unlock FPS</string></property></widget></item>
+                  <item><widget class="QLabel" name="d1"><property name="text"><string>Bypass Roblox's default 60 FPS cap</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="ToggleSwitch" name="unlockFpsCheck"/></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item>
+               <widget class="QFrame" name="row2">
+                <layout class="QHBoxLayout" name="row2L">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="icon2"><property name="text"><string>🎯</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="text2"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="t2"><property name="text"><string>Render Distance</string></property></widget></item>
+                  <item><widget class="QLabel" name="d2"><property name="text"><string>Lower far-object detail for more FPS</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="QComboBox" name="renderDistCombo"><property name="minimumSize"><size><width>140</width><height>0</height></size></property>
+                  <item><property name="text"><string>Low</string></property></item>
+                  <item><property name="text"><string>Medium</string></property></item>
+                  <item><property name="text"><string>High</string></property></item>
+                 </widget></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item>
+               <widget class="QFrame" name="row3">
+                <layout class="QHBoxLayout" name="row3L">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="icon3"><property name="text"><string>🌑</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="text3"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="t3"><property name="text"><string>Disable Shadows</string></property></widget></item>
+                  <item><widget class="QLabel" name="d3"><property name="text"><string>Removes dynamic shadows for a large FPS boost</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="ToggleSwitch" name="shadowsCheck"/></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item>
+               <widget class="QFrame" name="row4">
+                <layout class="QHBoxLayout" name="row4L">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="icon4"><property name="text"><string>✨</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="text4"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="t4"><property name="text"><string>Disable Post-Processing</string></property></widget></item>
+                  <item><widget class="QLabel" name="d4"><property name="text"><string>Removes bloom, depth of field, and sun rays</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="ToggleSwitch" name="postFxCheck"/></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item>
+               <widget class="QFrame" name="row5">
+                <layout class="QHBoxLayout" name="row5L">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="icon5"><property name="text"><string>🎚️</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="text5"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="t5"><property name="text"><string>FPS Limit</string></property></widget></item>
+                  <item><widget class="QLabel" name="d5"><property name="text"><string>Set maximum framerate (0 = unlimited)</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="QSpinBox" name="targetFpsSpin2"><property name="minimum"><number>0</number></property><property name="maximum"><number>9999</number></property><property name="value"><number>240</number></property><property name="minimumSize"><size><width>120</width><height>0</height></size></property></widget></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item>
+               <widget class="QFrame" name="row6">
+                <layout class="QHBoxLayout" name="row6L">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="icon6"><property name="text"><string>🌐</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="text6"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="t6"><property name="text"><string>Network &amp; Ping Boost</string></property></widget></item>
+                  <item><widget class="QLabel" name="d6"><property name="text"><string>Increase network tick rate and reduce latency</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="ToggleSwitch" name="pingBoostCheck"/></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item><spacer name="perfSp2"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property></spacer></item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+
+        <!-- ============ GRAPHICS ============ -->
+        <widget class="QWidget" name="pageGraphics">
+         <layout class="QVBoxLayout" name="gfxOuter">
+          <property name="spacing"><number>0</number></property>
+          <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property>
+          <item>
+           <widget class="QScrollArea" name="gfxScroll">
+            <property name="widgetResizable"><bool>true</bool></property>
+            <property name="frameShape"><enum>QFrame::NoFrame</enum></property>
+            <widget class="QWidget" name="gfxContent">
+             <layout class="QVBoxLayout" name="gfxLayout">
+              <property name="spacing"><number>10</number></property>
+              <property name="leftMargin"><number>40</number></property><property name="topMargin"><number>36</number></property><property name="rightMargin"><number>40</number></property><property name="bottomMargin"><number>36</number></property>
+
+              <item><widget class="QLabel" name="gfxEyebrow"><property name="text"><string>GRAPHICS</string></property></widget></item>
+              <item><widget class="QLabel" name="gfxTitle"><property name="text"><string>Visual Quality</string></property></widget></item>
+              <item><widget class="QLabel" name="gfxSubtitle"><property name="text"><string>Trade beauty for performance</string></property></widget></item>
+              <item><spacer name="gfxSp1"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property></spacer></item>
+
+              <item>
+               <widget class="QFrame" name="grow1">
+                <layout class="QHBoxLayout" name="grow1L">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="gicon1"><property name="text"><string>🌿</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="gtext1"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="gt1"><property name="text"><string>Disable Grass Textures</string></property></widget></item>
+                  <item><widget class="QLabel" name="gd1"><property name="text"><string>Removes grass from terrain</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="ToggleSwitch" name="grassCheck"/></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item>
+               <widget class="QFrame" name="grow2">
+                <layout class="QHBoxLayout" name="grow2L">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="gicon2"><property name="text"><string>🖼️</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="gtext2"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="gt2"><property name="text"><string>Texture Quality</string></property></widget></item>
+                  <item><widget class="QLabel" name="gd2"><property name="text"><string>Lower quality reduces VRAM usage</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="QComboBox" name="texQualityCombo"><property name="minimumSize"><size><width>140</width><height>0</height></size></property>
+                  <item><property name="text"><string>Lowest</string></property></item>
+                  <item><property name="text"><string>Low</string></property></item>
+                  <item><property name="text"><string>Medium</string></property></item>
+                  <item><property name="text"><string>High</string></property></item>
+                 </widget></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item>
+               <widget class="QFrame" name="grow3">
+                <layout class="QHBoxLayout" name="grow3L">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="gicon3"><property name="text"><string>💡</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="gtext3"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="gt3"><property name="text"><string>Lighting Mode</string></property></widget></item>
+                  <item><widget class="QLabel" name="gd3"><property name="text"><string>Voxel is fastest</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="QComboBox" name="lightingCombo"><property name="minimumSize"><size><width>180</width><height>0</height></size></property>
+                  <item><property name="text"><string>Voxel (fastest)</string></property></item>
+                  <item><property name="text"><string>ShadowMap</string></property></item>
+                  <item><property name="text"><string>Future (best)</string></property></item>
+                 </widget></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item>
+               <widget class="QFrame" name="grow4">
+                <layout class="QHBoxLayout" name="grow4L">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="gicon4"><property name="text"><string>🔷</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="gtext4"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="gt4"><property name="text"><string>Disable Anti-Aliasing</string></property></widget></item>
+                  <item><widget class="QLabel" name="gd4"><property name="text"><string>Smooths edges</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="ToggleSwitch" name="aaCheck"/></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item>
+               <widget class="QFrame" name="grow5">
+                <layout class="QHBoxLayout" name="grow5L">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="gicon5"><property name="text"><string>🌫️</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="gtext5"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="gt5"><property name="text"><string>Disable Bloom</string></property></widget></item>
+                  <item><widget class="QLabel" name="gd5"><property name="text"><string>Removes glow around lights</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="ToggleSwitch" name="bloomCheck"/></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item>
+               <widget class="QFrame" name="grow6">
+                <layout class="QHBoxLayout" name="grow6L">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="gicon6"><property name="text"><string>☁️</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="gtext6"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="gt6"><property name="text"><string>Gray Sky</string></property></widget></item>
+                  <item><widget class="QLabel" name="gd6"><property name="text"><string>Replaces sky with gray</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="ToggleSwitch" name="skyGrayCheck"/></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item><spacer name="gfxSp2"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property></spacer></item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+
+        <!-- ============ FASTFLAGS ============ -->
+        <widget class="QWidget" name="pageFastFlags">
+         <layout class="QVBoxLayout" name="ffOuter">
+          <property name="spacing"><number>0</number></property>
+          <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property>
+          <item>
+           <widget class="QScrollArea" name="ffScroll">
+            <property name="widgetResizable"><bool>true</bool></property>
+            <property name="frameShape"><enum>QFrame::NoFrame</enum></property>
+            <widget class="QWidget" name="ffContent">
+             <layout class="QVBoxLayout" name="ffLayout">
+              <property name="spacing"><number>10</number></property>
+              <property name="leftMargin"><number>40</number></property><property name="topMargin"><number>36</number></property><property name="rightMargin"><number>40</number></property><property name="bottomMargin"><number>36</number></property>
+
+              <item><widget class="QLabel" name="ffEyebrow"><property name="text"><string>ADVANCED</string></property></widget></item>
+              <item><widget class="QLabel" name="ffTitle"><property name="text"><string>FastFlags Editor</string></property></widget></item>
+              <item><widget class="QLabel" name="ffSubtitle"><property name="text"><string>Fine-tune rendering flags</string></property></widget></item>
+              <item><spacer name="ffSp1"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property></spacer></item>
+
+              <item>
+               <widget class="QFrame" name="ffrow1">
+                <layout class="QHBoxLayout" name="ffrow1L">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="fficon1"><property name="text"><string>📐</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="fftext1"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="fft1"><property name="text"><string>CSG Level of Detail</string></property></widget></item>
+                  <item><widget class="QLabel" name="ffd1"><property name="text"><string>DFIntCSGLevelOfDetailSwitchingDistance</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="QSpinBox" name="csgLodSpin"><property name="minimum"><number>0</number></property><property name="maximum"><number>1000</number></property><property name="value"><number>500</number></property><property name="minimumSize"><size><width>120</width><height>0</height></size></property></widget></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item>
+               <widget class="QFrame" name="ffrow2">
+                <layout class="QHBoxLayout" name="ffrow2L">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="fficon2"><property name="text"><string>🎚️</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="fftext2"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="fft2"><property name="text"><string>FRM Quality Override</string></property></widget></item>
+                  <item><widget class="QLabel" name="ffd2"><property name="text"><string>DFIntDebugFRMQualityLevelOverride (1-21)</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="QSpinBox" name="frmQualitySpin"><property name="minimum"><number>1</number></property><property name="maximum"><number>21</number></property><property name="value"><number>10</number></property><property name="minimumSize"><size><width>120</width><height>0</height></size></property></widget></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item>
+               <widget class="QFrame" name="ffrow3">
+                <layout class="QHBoxLayout" name="ffrow3L">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="fficon3"><property name="text"><string>⚡</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="fftext3"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="fft3"><property name="text"><string>Target FPS</string></property></widget></item>
+                  <item><widget class="QLabel" name="ffd3"><property name="text"><string>DFIntTaskSchedulerTargetFps</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="QSpinBox" name="targetFpsSpin"><property name="minimum"><number>0</number></property><property name="maximum"><number>9999</number></property><property name="value"><number>240</number></property><property name="minimumSize"><size><width>120</width><height>0</height></size></property></widget></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item><spacer name="ffSp2"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property></spacer></item>
+
+              <item>
+               <widget class="QFrame" name="ffCtaFrame">
+                <layout class="QHBoxLayout" name="ffCtaLayout">
+                 <property name="spacing"><number>16</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>22</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>22</number></property>
+                 <item><layout class="QVBoxLayout" name="ffCtaText"><property name="spacing"><number>4</number></property>
+                  <item><widget class="QLabel" name="ffCtaTitle"><property name="text"><string>Need more control?</string></property></widget></item>
+                  <item><widget class="QLabel" name="ffCtaDesc"><property name="text"><string>Add custom flags, import from file, or paste JSON</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="QPushButton" name="ffCustomButton"><property name="text"><string>⚙️  Custom FastFlags</string></property></widget></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item>
+               <widget class="QFrame" name="presetsDivider">
+                <property name="minimumSize"><size><width>0</width><height>1</height></size></property>
+                <property name="maximumSize"><size><width>16777215</width><height>1</height></size></property>
+               </widget>
+              </item>
+
+              <item><widget class="QLabel" name="ffSectionPresets"><property name="text"><string>QUICK PRESETS</string></property></widget></item>
+
+              <item>
+               <widget class="QFrame" name="presetsToggleRow">
+                <layout class="QHBoxLayout" name="presetsToggleLayout">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="presetsToggleIcon"><property name="text"><string>⚡</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="presetsToggleText"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="presetsToggleTitle"><property name="text"><string>Enable Preset Mode</string></property></widget></item>
+                  <item><widget class="QLabel" name="presetsToggleDesc"><property name="text"><string>Apply pre-made flag combinations with one click</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="ToggleSwitch" name="presetsToggle"/></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item>
+               <widget class="QWidget" name="presetsContainer" native="true">
+                <property name="visible"><bool>false</bool></property>
+                <layout class="QVBoxLayout" name="presetsContainerLayout">
+                 <property name="spacing"><number>10</number></property>
+                 <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property>
+                 <item>
+                  <widget class="QFrame" name="presetCardPerf">
+                   <layout class="QHBoxLayout" name="presetCardPerfLayout">
+                    <property name="spacing"><number>16</number></property>
+                    <property name="leftMargin"><number>22</number></property><property name="topMargin"><number>18</number></property><property name="rightMargin"><number>22</number></property><property name="bottomMargin"><number>18</number></property>
+                    <item><widget class="QLabel" name="presetPerfIcon"><property name="text"><string>🚀</string></property></widget></item>
+                    <item><layout class="QVBoxLayout" name="presetPerfText"><property name="spacing"><number>4</number></property>
+                     <item><widget class="QLabel" name="presetPerfTitle"><property name="text"><string>Performance</string></property></widget></item>
+                     <item><widget class="QLabel" name="presetPerfDesc"><property name="text"><string>Maximum FPS, minimum quality</string></property></widget></item>
+                    </layout></item>
+                    <item><widget class="QPushButton" name="presetPerfDetails"><property name="text"><string>Details</string></property></widget></item>
+                    <item><widget class="QPushButton" name="presetPerfApply"><property name="text"><string>Apply</string></property></widget></item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QFrame" name="presetCardBal">
+                   <layout class="QHBoxLayout" name="presetCardBalLayout">
+                    <property name="spacing"><number>16</number></property>
+                    <property name="leftMargin"><number>22</number></property><property name="topMargin"><number>18</number></property><property name="rightMargin"><number>22</number></property><property name="bottomMargin"><number>18</number></property>
+                    <item><widget class="QLabel" name="presetBalIcon"><property name="text"><string>⚖️</string></property></widget></item>
+                    <item><layout class="QVBoxLayout" name="presetBalText"><property name="spacing"><number>4</number></property>
+                     <item><widget class="QLabel" name="presetBalTitle"><property name="text"><string>Balanced</string></property></widget></item>
+                     <item><widget class="QLabel" name="presetBalDesc"><property name="text"><string>Good FPS with decent visuals</string></property></widget></item>
+                    </layout></item>
+                    <item><widget class="QPushButton" name="presetBalDetails"><property name="text"><string>Details</string></property></widget></item>
+                    <item><widget class="QPushButton" name="presetBalApply"><property name="text"><string>Apply</string></property></widget></item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QFrame" name="presetCardQual">
+                   <layout class="QHBoxLayout" name="presetCardQualLayout">
+                    <property name="spacing"><number>16</number></property>
+                    <property name="leftMargin"><number>22</number></property><property name="topMargin"><number>18</number></property><property name="rightMargin"><number>22</number></property><property name="bottomMargin"><number>18</number></property>
+                    <item><widget class="QLabel" name="presetQualIcon"><property name="text"><string>🎨</string></property></widget></item>
+                    <item><layout class="QVBoxLayout" name="presetQualText"><property name="spacing"><number>4</number></property>
+                     <item><widget class="QLabel" name="presetQualTitle"><property name="text"><string>Quality</string></property></widget></item>
+                     <item><widget class="QLabel" name="presetQualDesc"><property name="text"><string>Best visuals, higher system load</string></property></widget></item>
+                    </layout></item>
+                    <item><widget class="QPushButton" name="presetQualDetails"><property name="text"><string>Details</string></property></widget></item>
+                    <item><widget class="QPushButton" name="presetQualApply"><property name="text"><string>Apply</string></property></widget></item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+
+              <item><spacer name="ffSp3"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property></spacer></item>
+
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+
+        <!-- ============ SETTINGS ============ -->
+        <widget class="QWidget" name="pageSettings">
+         <layout class="QVBoxLayout" name="setOuter">
+          <property name="spacing"><number>0</number></property>
+          <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property>
+          <item>
+           <widget class="QScrollArea" name="setScroll">
+            <property name="widgetResizable"><bool>true</bool></property>
+            <property name="frameShape"><enum>QFrame::NoFrame</enum></property>
+            <widget class="QWidget" name="setContent">
+             <layout class="QVBoxLayout" name="setLayout">
+              <property name="spacing"><number>10</number></property>
+              <property name="leftMargin"><number>40</number></property><property name="topMargin"><number>36</number></property><property name="rightMargin"><number>40</number></property><property name="bottomMargin"><number>36</number></property>
+
+              <item><widget class="QLabel" name="setEyebrow"><property name="text"><string>SETTINGS</string></property></widget></item>
+              <item><widget class="QLabel" name="setTitle"><property name="text"><string>Configuration</string></property></widget></item>
+              <item><widget class="QLabel" name="setSubtitle"><property name="text"><string>Configure SudoStrap to your preferences</string></property></widget></item>
+              <item><spacer name="setSp1"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property></spacer></item>
+
+              <item><widget class="QLabel" name="setSectionGeneral"><property name="text"><string>GENERAL</string></property></widget></item>
+
+              <item>
+               <widget class="QFrame" name="setRowUpdate">
+                <layout class="QHBoxLayout" name="setRowUpdateLayout">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="setIconUpdate"><property name="text"><string>⚙️</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="setTextUpdate"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="setTitleUpdate"><property name="text"><string>Auto-Update</string></property></widget></item>
+                  <item><widget class="QLabel" name="setDescUpdate"><property name="text"><string>Automatically check and install updates on startup</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="ToggleSwitch" name="setToggleUpdate"/></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item>
+               <widget class="QFrame" name="setRowStartup">
+                <layout class="QHBoxLayout" name="setRowStartupLayout">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="setIconStartup"><property name="text"><string>🚀</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="setTextStartup"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="setTitleStartup"><property name="text"><string>Launch on Startup</string></property></widget></item>
+                  <item><widget class="QLabel" name="setDescStartup"><property name="text"><string>Start SudoStrap automatically with your system</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="ToggleSwitch" name="setToggleStartup"/></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item><widget class="QLabel" name="setSectionLang"><property name="text"><string>LANGUAGE</string></property></widget></item>
+
+              <item>
+               <widget class="QFrame" name="setRowLang">
+                <layout class="QHBoxLayout" name="setRowLangLayout">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="setIconLang"><property name="text"><string>🌍</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="setTextLang"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="setTitleLang"><property name="text"><string>Interface Language</string></property></widget></item>
+                  <item><widget class="QLabel" name="setDescLang"><property name="text"><string>Choose the language for SudoStrap interface</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="QComboBox" name="setLangCombo"><property name="minimumSize"><size><width>160</width><height>0</height></size></property>
+                  <item><property name="text"><string>English</string></property></item>
+                  <item><property name="text"><string>العربية</string></property></item>
+                 </widget></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item><spacer name="setSp2"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property></spacer></item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+
+        <!-- ============ ABOUT ============ -->
+        <widget class="QWidget" name="pageAbout">
+         <layout class="QVBoxLayout" name="abtOuter">
+          <property name="spacing"><number>0</number></property>
+          <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property>
+          <item>
+           <widget class="QScrollArea" name="abtScroll">
+            <property name="widgetResizable"><bool>true</bool></property>
+            <property name="frameShape"><enum>QFrame::NoFrame</enum></property>
+            <widget class="QWidget" name="abtContent">
+             <layout class="QVBoxLayout" name="abtLayout">
+              <property name="spacing"><number>12</number></property>
+              <property name="leftMargin"><number>40</number></property><property name="topMargin"><number>36</number></property><property name="rightMargin"><number>40</number></property><property name="bottomMargin"><number>36</number></property>
+
+              <item><widget class="QLabel" name="abtEyebrow"><property name="text"><string>ABOUT</string></property></widget></item>
+              <item><widget class="QLabel" name="abtTitle"><property name="text"><string>SudoStrap</string></property></widget></item>
+              <item><widget class="QLabel" name="abtSubtitle"><property name="text"><string>FastFlags Manager for Linux</string></property></widget></item>
+              <item><spacer name="abtSp1"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeType"><enum>QSizePolicy::Fixed</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>16</height></size></property></spacer></item>
+
+              <item>
+               <widget class="QFrame" name="abtHero">
+                <layout class="QHBoxLayout" name="abtHeroLayout">
+                 <property name="spacing"><number>24</number></property>
+                 <property name="leftMargin"><number>28</number></property><property name="topMargin"><number>28</number></property><property name="rightMargin"><number>28</number></property><property name="bottomMargin"><number>28</number></property>
+                 <item><widget class="QLabel" name="abtLogo"><property name="text"><string>⚡</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="abtHeroText"><property name="spacing"><number>6</number></property>
+                  <item><widget class="QLabel" name="abtHeroTitle"><property name="text"><string>SudoStrap</string></property></widget></item>
+                  <item><widget class="QLabel" name="abtHeroVersion"><property name="text"><string>Version 0.1.0</string></property></widget></item>
+                  <item><widget class="QLabel" name="abtHeroDesc"><property name="text"><string>A modern FastFlags manager for Roblox on Linux — built with Qt6 and C++.</string></property></widget></item>
+                 </layout></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item>
+               <widget class="QFrame" name="abtLinks">
+                <layout class="QVBoxLayout" name="abtLinksLayout">
+                 <property name="spacing"><number>12</number></property>
+                 <property name="leftMargin"><number>28</number></property><property name="topMargin"><number>24</number></property><property name="rightMargin"><number>28</number></property><property name="bottomMargin"><number>24</number></property>
+                 <item><widget class="QLabel" name="abtLinksTitle"><property name="text"><string>LINKS</string></property></widget></item>
+                 <item><layout class="QHBoxLayout" name="abtLinksRow"><property name="spacing"><number>10</number></property>
+                  <item><widget class="QPushButton" name="btnGithub"><property name="text"><string>📖  GitHub</string></property></widget></item>
+                  <item><widget class="QPushButton" name="btnDocs"><property name="text"><string>📚  Documentation</string></property></widget></item>
+                  <item><widget class="QPushButton" name="btnIssue"><property name="text"><string>🐛  Report Issue</string></property></widget></item>
+                 </layout></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item>
+               <widget class="QFrame" name="abtCredits">
+                <layout class="QVBoxLayout" name="abtCreditsLayout">
+                 <property name="spacing"><number>8</number></property>
+                 <property name="leftMargin"><number>28</number></property><property name="topMargin"><number>24</number></property><property name="rightMargin"><number>28</number></property><property name="bottomMargin"><number>24</number></property>
+                 <item><widget class="QLabel" name="abtCreditsTitle"><property name="text"><string>CREDITS</string></property></widget></item>
+                 <item><widget class="QLabel" name="abtCreditsText"><property name="text"><string>Built with love for the Linux gaming community. Special thanks to the Sober team and the Qt Project.</string></property><property name="wordWrap"><bool>true</bool></property></widget></item>
+                </layout>
+               </widget>
+              </item>
+
+              <item><spacer name="abtSp2"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property></spacer></item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+
+       </widget>
+      </item>
+     </layout>
+    </item>
+
+    <item>
+     <widget class="QFrame" name="footer">
+      <property name="minimumSize"><size><width>0</width><height>46</height></size></property>
+      <property name="maximumSize"><size><width>16777215</width><height>46</height></size></property>
+      <layout class="QHBoxLayout" name="footerLayout">
+       <property name="spacing"><number>10</number></property>
+       <property name="leftMargin"><number>20</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>20</number></property><property name="bottomMargin"><number>0</number></property>
+       <item><widget class="QLabel" name="versionLabel"><property name="text"><string>v0.1.0  ·  Ready</string></property></widget></item>
+       <item><widget class="QLabel" name="updateLabel"><property name="text"><string>· Update available</string></property><property name="visible"><bool>false</bool></property></widget></item>
+       <item><widget class="QPushButton" name="updateButton"><property name="text"><string>⬇  Update</string></property><property name="visible"><bool>false</bool></property></widget></item>
+       <item><widget class="QProgressBar" name="progressBar"><property name="minimumSize"><size><width>220</width><height>6</height></size></property><property name="maximumSize"><size><width>220</width><height>6</height></size></property><property name="value"><number>0</number></property><property name="textVisible"><bool>false</bool></property><property name="visible"><bool>false</bool></property></widget></item>
+       <item><spacer name="footerSpacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
+       <item><widget class="QPushButton" name="resetButton"><property name="text"><string>↺  Reset</string></property></widget></item>
+       <item><widget class="QPushButton" name="saveButton"><property name="text"><string>💾  Save</string></property></widget></item>
+       <item><widget class="QPushButton" name="closeButton"><property name="text"><string>✕  Close</string></property></widget></item>
+      </layout>
+     </widget>
+    </item>
+
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ToggleSwitch</class>
+   <extends>QAbstractButton</extends>
+   <header>ui/toggleswitch.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
