@@ -207,7 +207,7 @@ Screenshots coming soon — run the app to see the current design!
     ├── .gitignore
     ├── resources/
     │   ├── icons/
-    │   │   ├── logo.jpg
+    │   │   ├── logo.png
     │   │   ├── toggle_on.svg
     │   │   ├── toggle_off.svg
     │   │   ├── arrow_up.svg

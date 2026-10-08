@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=SudoStrap
+GenericName=FastFlags Manager
+Comment=Manage Roblox FastFlags on Linux
+Exec=sudostrap
+Icon=sudostrap
+Terminal=false
+Categories=Game;Utility;
+Keywords=roblox;sober;fastflags;gaming;
+StartupNotify=true
+StartupWMClass=SudoStrap
