@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="resources/icons/logo_banner.jpg" alt="SudoStrap" width="600" />
+<img src="resources/icons/logo_banner.png" alt="SudoStrap" width="600" />
 
 # ⚡ SudoStrap
 
@@ -332,7 +332,7 @@ This project is licensed under the **MIT License** — see the LICENSE file for 
 
 <div align="center">
 
-<img src="resources/icons/logo_banner.jpg" alt="SudoStrap" width="80" />
+<img src="resources/icons/logo_banner.png" alt="SudoStrap" width="80" />
 
 **Made with ❤️ for the Linux gaming community**
 
