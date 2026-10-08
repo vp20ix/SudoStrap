@@ -12,7 +12,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationVersion("0.1.0");
     QCoreApplication::setOrganizationName("SudoStrap");
 
-    QFile styleFile("resources/style.qss");
+    QString stylePath = QString::fromUtf8(qgetenv("HOME")) + "/.local/share/sudostrap/style.qss";
+    QFile styleFile(stylePath);
     if (styleFile.open(QFile::ReadOnly | QFile::Text)) {
         QTextStream stream(&styleFile);
         app.setStyleSheet(stream.readAll());
