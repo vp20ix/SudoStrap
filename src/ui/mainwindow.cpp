@@ -76,6 +76,9 @@ MainWindow::MainWindow(QWidget *parent)
     installGlow(ui->closeButton,  QColor(255, 90, 90), 24);
     installGlow(ui->resetButton,  QColor(240, 160, 80), 24);
     installGlow(ui->ffCustomButton, QColor(34, 211, 238), 28);
+    installGlow(ui->btnGithub, QColor(34, 211, 238), 24);
+    installGlow(ui->btnDocs,   QColor(34, 211, 238), 24);
+    installGlow(ui->btnIssue,  QColor(124, 92, 255), 24);
 
     // ============ Bidirectional sync ============
     // FPS Limit
@@ -122,13 +125,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     // About page links
     connect(ui->btnGithub, &QPushButton::clicked, this, []() {
-        QDesktopServices::openUrl(QUrl("https://github.com/SudoStrap/SudoStrap"));
+        QDesktopServices::openUrl(QUrl("https://github.com/vp20ix/SudoStrap"));
     });
     connect(ui->btnDocs, &QPushButton::clicked, this, []() {
-        QDesktopServices::openUrl(QUrl("https://github.com/SudoStrap/SudoStrap/wiki"));
+        QDesktopServices::openUrl(QUrl("https://github.com/vp20ix/SudoStrap/wiki"));
     });
     connect(ui->btnIssue, &QPushButton::clicked, this, []() {
-        QDesktopServices::openUrl(QUrl("https://github.com/SudoStrap/SudoStrap/issues"));
+        QDesktopServices::openUrl(QUrl("https://github.com/vp20ix/SudoStrap/issues"));
     });
 
     auto connectDirty = [this](QObject *obj) {
