@@ -256,3 +256,22 @@ void CustomFFDialog::onExportClicked()
     QMessageBox::information(this, "Export Complete",
         "Exported " + QString::number(flags.size()) + " flag(s) to:\n" + path);
 }
+
+void CustomFFDialog::setInitialFlags(const QMap<QString, QString> &initFlags)
+{
+    flags.clear();
+    table->setRowCount(0);
+    
+    for (auto it = initFlags.begin(); it != initFlags.end(); ++it) {
+        addFlagRow(it.key(), it.value(), "Config");
+    }
+}
+
+QMap<QString, QString> CustomFFDialog::currentFlags() const
+{
+    QMap<QString, QString> result;
+    for (const auto &f : flags) {
+        result[f.name] = f.value;
+    }
+    return result;
+}

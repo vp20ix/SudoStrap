@@ -279,6 +279,24 @@
                </widget>
               </item>
 
+              <item>
+               <widget class="QFrame" name="grow7">
+                <layout class="QHBoxLayout" name="grow7L">
+                 <property name="spacing"><number>20</number></property>
+                 <property name="leftMargin"><number>24</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>24</number></property><property name="bottomMargin"><number>20</number></property>
+                 <item><widget class="QLabel" name="gicon7"><property name="text"><string>⚙️</string></property></widget></item>
+                 <item><layout class="QVBoxLayout" name="gtext7"><property name="spacing"><number>3</number></property>
+                  <item><widget class="QLabel" name="gt7"><property name="text"><string>Graphics API</string></property></widget></item>
+                  <item><widget class="QLabel" name="gd7"><property name="text"><string>Vulkan (default) or OpenGL</string></property></widget></item>
+                 </layout></item>
+                 <item><widget class="QComboBox" name="gfxApiCombo"><property name="minimumSize"><size><width>180</width><height>0</height></size></property>
+                  <item><property name="text"><string>Vulkan (faster)</string></property></item>
+                  <item><property name="text"><string>OpenGL (stable)</string></property></item>
+                 </widget></item>
+                </layout>
+               </widget>
+              </item>
+
               <item><spacer name="gfxSp2"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property></spacer></item>
              </layout>
             </widget>

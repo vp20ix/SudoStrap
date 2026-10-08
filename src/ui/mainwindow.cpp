@@ -63,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
     styleComboPopup(ui->texQualityCombo);
     styleComboPopup(ui->lightingCombo);
     styleComboPopup(ui->setLangCombo);
+    styleComboPopup(ui->gfxApiCombo);
 
 
 
@@ -284,6 +285,8 @@ MainWindow::MainWindow(QWidget *parent)
     // Load saved config on startup
     syncConfigToUI_Load();
 
+    refreshFlagsTable();
+
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -309,45 +312,35 @@ void MainWindow::showFastFlagsPage()   { ui->pagesStack->setCurrentIndex(2); }
 void MainWindow::showSettingsPage()    { ui->pagesStack->setCurrentIndex(3); }
 void MainWindow::showAboutPage()       { ui->pagesStack->setCurrentIndex(4); }
 
-void MainWindow::openCustomFFDialog() { CustomFFDialog d(this); d.exec(); }
-
-void MainWindow::onSaveClicked()
+void MainWindow::openCustomFFDialog()
 {
-    // ---- Detect if Sober is running (via flatpak) ----
-    QProcess ps;
-    ps.start("flatpak", {"ps"});
-    ps.waitForFinished(1500);
-    QString output = QString::fromUtf8(ps.readAllStandardOutput());
-    bool soberRunning = output.contains("org.vinegarhq.Sober");
-
-    if (soberRunning) {
-        QMessageBox::warning(this, "Sober is Running",
-            "Sober is currently running. Saving settings now may "
-            "cause Roblox to crash or close.\n\n"
-            "Please close Sober first, then save again.");
-        return;
-    }
-
-    setStatus("Saving...");
-    showProgress(0);
-    QTimer::singleShot(200, this, [this]() { showProgress(50); });
-
-    QTimer::singleShot(500, this, [this]() {
-        syncConfigToUI();
-
-        if (m_config.save()) {
-            showProgress(100);
-            setStatus("Saved OK");
-            resetDirty();
-            QTimer::singleShot(700, this, [this]() { hideProgress(); });
-            QTimer::singleShot(2400, this, [this]() { setStatus("Ready"); });
-        } else {
-            hideProgress();
-            setStatus("Save failed");
-            QMessageBox::warning(this, "Save Failed", m_config.lastError());
-            QTimer::singleShot(3000, this, [this]() { setStatus("Ready"); });
+    CustomFFDialog dialog(this);
+    dialog.setInitialFlags(m_config.flags());
+    
+    if (dialog.exec() == QDialog::Accepted) {
+        QMap<QString, QString> oldFlags = m_config.flags();
+        QMap<QString, QString> newFlags = dialog.currentFlags();
+        
+        // Apply to memory
+        m_config.clearFlags();
+        for (auto it = newFlags.begin(); it != newFlags.end(); ++it) {
+            m_config.setFlag(it.key(), it.value());
         }
-    });
+        
+        // Apply changed flags to UI (two-way sync)
+        for (auto it = newFlags.begin(); it != newFlags.end(); ++it) {
+            if (oldFlags.value(it.key()) != it.value()) {
+                applySingleFlagToUI(it.key(), it.value());
+            }
+        }
+        
+        // Refresh table with all flags
+        refreshFlagsTable();
+        
+        markDirty();
+        setStatus(QString::fromUtf8("Custom flags updated \u2713"));
+        QTimer::singleShot(2000, this, [this]() { setStatus("Ready"); });
+    }
 }
 
 void MainWindow::syncConfigToUI()
@@ -502,6 +495,46 @@ void MainWindow::onResetClicked()
     QTimer::singleShot(2000, this, [this]() { setStatus("Ready"); });
 }
 
+
+void MainWindow::onSaveClicked()
+{
+    // Check if Sober is running
+    QProcess check;
+    check.start("flatpak", {"ps"});
+    check.waitForFinished(1500);
+    QString output = QString::fromUtf8(check.readAllStandardOutput());
+    bool soberRunning = output.contains("org.vinegarhq.Sober");
+
+    if (soberRunning) {
+        QMessageBox::warning(this, "Sober is Running",
+            "Sober is currently running. Saving settings now may "
+            "cause Roblox to crash or close.\n\n"
+            "Please close Sober first, then save again.");
+        return;
+    }
+
+    setStatus("Saving...");
+    showProgress(0);
+    QTimer::singleShot(200, this, [this]() { showProgress(50); });
+
+    QTimer::singleShot(500, this, [this]() {
+        syncConfigToUI();
+
+        if (m_config.save()) {
+            showProgress(100);
+            setStatus("Saved OK");
+            refreshFlagsTable();
+            resetDirty();
+            QTimer::singleShot(700, this, [this]() { hideProgress(); });
+            QTimer::singleShot(2400, this, [this]() { setStatus("Ready"); });
+        } else {
+            hideProgress();
+            setStatus("Save failed");
+            QMessageBox::warning(this, "Save Failed", m_config.lastError());
+            QTimer::singleShot(3000, this, [this]() { setStatus("Ready"); });
+        }
+    });
+}
 
 void MainWindow::markDirty()
 {
@@ -996,4 +1029,109 @@ void MainWindow::showPresetDetails(int presetId)
     box.exec();
 }
 
+void MainWindow::refreshFlagsTable()
+{
+    if (!ui->ffTable) return;
+    
+    ui->ffTable->setRowCount(0);
+    
+    auto flags = m_config.flags();
+    
+    // Category helper
+    auto category = [](const QString &key) -> QString {
+        if (key.contains("Fps") || key.contains("Shadow") || key.contains("CSG"))
+            return "Performance";
+        if (key.contains("Texture") || key.contains("FRM") || key.contains("Grass") ||
+            key.contains("Render") || key.contains("Sky") || key.contains("Light") ||
+            key.contains("Voxel") || key.contains("MSAA"))
+            return "Graphics";
+        if (key.contains("Network") || key.contains("Tick") || key.contains("Ping") ||
+            key.contains("Bandwidth") || key.contains("Latency"))
+            return "Network";
+        if (key.contains("Telemetry") || key.contains("Debug"))
+            return "Debug";
+        return "Other";
+    };
+    
+    for (auto it = flags.begin(); it != flags.end(); ++it) {
+        int row = ui->ffTable->rowCount();
+        ui->ffTable->insertRow(row);
+        ui->ffTable->setItem(row, 0, new QTableWidgetItem(it.key()));
+        ui->ffTable->setItem(row, 1, new QTableWidgetItem(it.value()));
+        ui->ffTable->setItem(row, 2, new QTableWidgetItem(category(it.key())));
+    }
+}
+
+void MainWindow::applySingleFlagToUI(const QString &key, const QString &value)
+{
+    // FPS
+    if (key == "DFIntTaskSchedulerTargetFps") {
+        bool ok = false;
+        int v = value.toInt(&ok);
+        if (ok && v > 0) {
+            if (auto *ts = qobject_cast<ToggleSwitch*>(ui->unlockFpsCheck))
+                ts->setCheckedVisual(true);
+            ui->targetFpsSpin2->setValue(v);
+            ui->targetFpsSpin->setValue(v);
+        }
+    }
+    // CSG / Shadows
+    else if (key == "DFIntCSGLevelOfDetailSwitchingDistance") {
+        bool ok = false;
+        int v = value.toInt(&ok);
+        if (ok) {
+            ui->csgLodSpin->setValue(v);
+            if (auto *ts = qobject_cast<ToggleSwitch*>(ui->shadowsCheck))
+                ts->setCheckedVisual(v == 0);
+        }
+    }
+    // FRM Quality
+    else if (key == "DFIntDebugFRMQualityLevelOverride") {
+        bool ok = false;
+        int v = value.toInt(&ok);
+        if (ok) {
+            ui->frmQualitySpin->setValue(v);
+            if (auto *ts = qobject_cast<ToggleSwitch*>(ui->postFxCheck))
+                ts->setCheckedVisual(v == 1);
+        }
+    }
+    // Texture Quality
+    else if (key == "DFIntTextureQualityOverride") {
+        bool ok = false;
+        int v = value.toInt(&ok);
+        if (ok && v >= 0 && v <= 3) {
+            ui->texQualityCombo->setCurrentIndex(v);
+        }
+    }
+    // Grass
+    else if (key == "FIntFRMMaxGrassDistance") {
+        bool ok = false;
+        int v = value.toInt(&ok);
+        if (ok) {
+            if (v == 0) {
+                if (auto *ts = qobject_cast<ToggleSwitch*>(ui->grassCheck))
+                    ts->setCheckedVisual(true);
+                ui->renderDistCombo->setCurrentIndex(0);
+            } else if (v == 500) {
+                if (auto *ts = qobject_cast<ToggleSwitch*>(ui->grassCheck))
+                    ts->setCheckedVisual(false);
+                ui->renderDistCombo->setCurrentIndex(1);
+            } else if (v == 1000) {
+                if (auto *ts = qobject_cast<ToggleSwitch*>(ui->grassCheck))
+                    ts->setCheckedVisual(false);
+                ui->renderDistCombo->setCurrentIndex(2);
+            }
+        }
+    }
+    // Gray Sky
+    else if (key == "FFlagDebugSkyGray") {
+        if (auto *ts = qobject_cast<ToggleSwitch*>(ui->skyGrayCheck))
+            ts->setCheckedVisual(value == "true");
+    }
+    // AA
+    else if (key == "FIntDebugForceMSAASamples") {
+        if (auto *ts = qobject_cast<ToggleSwitch*>(ui->aaCheck))
+            ts->setCheckedVisual(value == "1");
+    }
+}
 

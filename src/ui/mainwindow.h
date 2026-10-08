@@ -53,6 +53,8 @@ private:
     void syncUIToConfig();
     void syncConfigToUI();
     void syncConfigToUI_Load();
+    void refreshFlagsTable();
+    void applySingleFlagToUI(const QString &key, const QString &value);
     void setActivePreset(int presetId);
 
     Ui::MainWindow *ui;
