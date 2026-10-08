@@ -1,0 +1,27 @@
+# Build artifacts
+build/
+*.o
+*.so
+*.a
+
+# Qt generated
+*.user
+*.autosave
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+*_autogen/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary
+*.tmp
+*.log

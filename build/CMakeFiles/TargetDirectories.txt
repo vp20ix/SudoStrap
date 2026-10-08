@@ -1,5 +1,0 @@
-/home/vp20/SudoStrap/build/CMakeFiles/SudoStrap.dir
-/home/vp20/SudoStrap/build/CMakeFiles/edit_cache.dir
-/home/vp20/SudoStrap/build/CMakeFiles/rebuild_cache.dir
-/home/vp20/SudoStrap/build/CMakeFiles/SudoStrap_autogen_timestamp_deps.dir
-/home/vp20/SudoStrap/build/CMakeFiles/SudoStrap_autogen.dir
