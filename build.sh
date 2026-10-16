@@ -59,6 +59,11 @@ mkdir -p ~/.local/share/sudostrap
 cp resources/style.qss ~/.local/share/sudostrap/style.qss
 
 echo ""
+echo "🔗 Linking binary to ~/.local/bin/sudostrap..."
+mkdir -p ~/.local/bin
+ln -sf "$(pwd)/build/SudoStrap" ~/.local/bin/sudostrap
+
+echo ""
 echo "✅ Build complete!"
 echo ""
 echo "Run SudoStrap with:"

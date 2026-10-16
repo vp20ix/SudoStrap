@@ -313,18 +313,20 @@ void MainWindow::openCustomFFDialog()
 {
     CustomFFDialog dialog(this);
     dialog.setInitialFlags(m_config.flags());
-    
-    if (dialog.exec() == QDialog::Accepted) {
-        QMap<QString, QString> oldFlags = m_config.flags();
-        QMap<QString, QString> newFlags = dialog.currentFlags();
-        
-        // Apply to memory
+
+    QMap<QString, QString> before = m_config.flags();
+
+    dialog.exec();  // شغّل المحرر بغض النظر عن طريقة الإغلاق
+
+    QMap<QString, QString> after = dialog.currentFlags();
+
+    // إذا تغيرت الفلاغات، طبّقها وفعّل زر Save
+    if (after != before) {
         m_config.clearFlags();
-        for (auto it = newFlags.begin(); it != newFlags.end(); ++it) {
+        for (auto it = after.begin(); it != after.end(); ++it) {
             m_config.setFlag(it.key(), it.value());
         }
-        
-        
+
         markDirty();
         setStatus(QString::fromUtf8("Custom flags updated \u2713"));
         QTimer::singleShot(2000, this, [this]() { setStatus("Ready"); });
