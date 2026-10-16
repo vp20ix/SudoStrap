@@ -71,7 +71,6 @@ Built with **C++17** and **Qt6**, SudoStrap offers a smooth, native Linux experi
 - 💾 **Safe saving** — Atomic file writes
 - ⚠️ **Process detection** — Warns if Sober is running
 - ↺ **Reset to defaults** — One-click reset
-- ⚙️ **Auto-update checker** — Silent background checks
 - 🎨 **Modern UI** — Glassmorphism-inspired dark theme
 - ⚡ **Native performance** — No Electron, no bloat
 
@@ -280,7 +279,6 @@ Found a bug? Open an issue at https://github.com/vp20ix/SudoStrap/issues with:
 - [x] Arabic translation
 - [ ] Keyboard shortcuts
 - [ ] System tray icon
-- [ ] Auto-update (real implementation)
 - [ ] Flatpak packaging
 - [ ] AppImage release
 - [ ] Plugin system

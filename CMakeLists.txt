@@ -31,7 +31,6 @@ set(SOURCES
     src/ui/customffdialog.cpp
     src/ui/launchdialog.cpp
     src/ui/toggleswitch.cpp
-    src/ui/glowlogo.cpp
     src/ui/updatedialog.cpp
     src/core/configmanager.cpp
 )
@@ -41,7 +40,6 @@ set(HEADERS
     src/ui/customffdialog.h
     src/ui/launchdialog.h
     src/ui/toggleswitch.h
-    src/ui/glowlogo.h
     src/ui/updatedialog.h
     src/core/configmanager.h
 )

@@ -13,14 +13,18 @@ public:
 
     // Paths
     static QString configPath();
+    static QString profilePath();
     static QString backupDir();
 
     // Reading
     bool load();
+    bool loadProfile();
     bool configExists() const;
 
     // Writing
     bool save();
+    bool saveProfile();
+    bool restoreFromProfile();
 
     // Flag management
     void setFlag(const QString &key, const QString &value);

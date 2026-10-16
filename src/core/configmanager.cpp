@@ -13,6 +13,78 @@ QString ConfigManager::configPath()
            "/.var/app/org.vinegarhq.Sober/config/sober/config.json";
 }
 
+QString ConfigManager::profilePath()
+{
+    return QDir::homePath() + "/.config/SudoStrap/profile.json";
+}
+
+bool ConfigManager::saveProfile()
+{
+    QJsonObject root;
+    QJsonObject ff;
+    
+    for (auto it = m_flags.begin(); it != m_flags.end(); ++it) {
+        const QString &v = it.value();
+        if (v == "true" || v == "false") {
+            ff[it.key()] = (v == "true");
+        } else {
+            bool ok = false;
+            double num = v.toDouble(&ok);
+            if (ok && !v.contains('.') && !v.contains('e')) {
+                ff[it.key()] = static_cast<int>(num);
+            } else if (ok) {
+                ff[it.key()] = num;
+            } else {
+                ff[it.key()] = v;
+            }
+        }
+    }
+    root["fflags"] = ff;
+    root["use_opengl"] = m_useOpenGL;
+    
+    QDir().mkpath(QFileInfo(profilePath()).absolutePath());
+    QFile f(profilePath());
+    if (!f.open(QFile::WriteOnly | QFile::Truncate)) return false;
+    f.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
+    f.close();
+    return true;
+}
+
+bool ConfigManager::loadProfile()
+{
+    QFile f(profilePath());
+    if (!f.exists()) return false;
+    if (!f.open(QFile::ReadOnly)) return false;
+    
+    QJsonDocument doc = QJsonDocument::fromJson(f.readAll());
+    f.close();
+    
+    QJsonObject root = doc.object();
+    if (!root.contains("fflags")) return false;
+    
+    m_flags.clear();
+    if (root.contains("use_opengl")) m_useOpenGL = root["use_opengl"].toBool();
+    
+    QJsonObject ff = root["fflags"].toObject();
+    for (auto it = ff.begin(); it != ff.end(); ++it) {
+        QString val;
+        if (it.value().isString()) val = it.value().toString();
+        else if (it.value().isBool()) val = it.value().toBool() ? "true" : "false";
+        else if (it.value().isDouble()) val = QString::number(it.value().toDouble(), 'g', 15);
+        m_flags[it.key()] = val;
+    }
+    return true;
+}
+
+bool ConfigManager::restoreFromProfile()
+{
+    if (!loadProfile()) {
+        m_lastError = "No profile found";
+        return false;
+    }
+    return save();
+}
+
 QString ConfigManager::backupDir()
 {
     QString dir = QDir::homePath() + "/.config/SudoStrap/backups";

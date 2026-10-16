@@ -268,7 +268,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->presetQualDetails, &QPushButton::clicked, this, [this]() { showPresetDetails(2); });
     connect(ui->resetButton, &QPushButton::clicked, this, &MainWindow::onResetClicked);
     connect(ui->closeButton, &QPushButton::clicked, this, &MainWindow::onCloseClicked);
-    connect(ui->updateButton, &QPushButton::clicked, this, &MainWindow::onUpdateClicked);
 
     // Settings connections
     connect(ui->setToggleUpdate, &QAbstractButton::toggled, this, [this](bool on) {
@@ -284,8 +283,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Load saved config on startup
     syncConfigToUI_Load();
-
-    refreshFlagsTable();
 
 }
 
@@ -327,15 +324,6 @@ void MainWindow::openCustomFFDialog()
             m_config.setFlag(it.key(), it.value());
         }
         
-        // Apply changed flags to UI (two-way sync)
-        for (auto it = newFlags.begin(); it != newFlags.end(); ++it) {
-            if (oldFlags.value(it.key()) != it.value()) {
-                applySingleFlagToUI(it.key(), it.value());
-            }
-        }
-        
-        // Refresh table with all flags
-        refreshFlagsTable();
         
         markDirty();
         setStatus(QString::fromUtf8("Custom flags updated \u2713"));
@@ -431,9 +419,16 @@ void MainWindow::syncConfigToUI()
 void MainWindow::onCloseClicked() { close(); }
 
 void MainWindow::onLaunchClicked() {
+    // ← استرجع إعداداتك من profile.json قبل تشغيل Sober
+    if (m_config.loadProfile()) {
+        m_config.save();  // اكتبها في config.json
+        setStatus("Settings restored");
+    }
+    
     LaunchDialog dlg(this);
     dlg.startLaunch();
     dlg.exec();
+    
     // بعد ما ينتهي الـ Dialog، أغلق البرنامج الرئيسي
     close();
 }
@@ -521,9 +516,9 @@ void MainWindow::onSaveClicked()
         syncConfigToUI();
 
         if (m_config.save()) {
+            m_config.saveProfile();  // ← احفظ نسخة خاصة
             showProgress(100);
             setStatus("Saved OK");
-            refreshFlagsTable();
             resetDirty();
             QTimer::singleShot(700, this, [this]() { hideProgress(); });
             QTimer::singleShot(2400, this, [this]() { setStatus("Ready"); });
@@ -604,34 +599,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 }
 
 
-void MainWindow::checkForUpdates()
-{
-    const QString currentVersion = "0.1.0";
-    const QString latestVersion  = "0.2.0";
 
-    if (latestVersion == currentVersion) return;
-
-    if (m_autoUpdateEnabled) {
-        // Auto-update ON → show update dialog automatically
-        UpdateDialog dlg(latestVersion, this);
-        dlg.startUpdate();
-        dlg.exec();
-        // بعد التحديث (محاكاة)
-        close();
-    } else {
-        // Auto-update OFF → show footer notification
-        ui->updateLabel->setText("· Update available: v" + latestVersion);
-        ui->updateLabel->setVisible(true);
-        ui->updateButton->setVisible(true);
-    }
-}
-
-void MainWindow::onUpdateClicked()
-{
-    UpdateDialog dlg("0.2.0", this);
-    dlg.startUpdate();
-    dlg.exec();
-}
 
 void MainWindow::onLanguageChanged(int index)
 {
@@ -740,7 +708,11 @@ void MainWindow::syncConfigToUI_Load()
     dbg.open(QFile::WriteOnly);
     dbg.write("=== syncConfigToUI_Load called ===\n");
 
-    bool loaded = m_config.load();
+    // حاول profile أولاً، إذا ما فيه احمل من config
+    bool loaded = m_config.loadProfile();
+    if (!loaded) {
+        loaded = m_config.load();
+    }
     dbg.write(("load() result: " + QString(loaded ? "TRUE" : "FALSE") + "\n").toUtf8());
 
     if (!loaded) {
@@ -1029,109 +1001,5 @@ void MainWindow::showPresetDetails(int presetId)
     box.exec();
 }
 
-void MainWindow::refreshFlagsTable()
-{
-    if (!ui->ffTable) return;
-    
-    ui->ffTable->setRowCount(0);
-    
-    auto flags = m_config.flags();
-    
-    // Category helper
-    auto category = [](const QString &key) -> QString {
-        if (key.contains("Fps") || key.contains("Shadow") || key.contains("CSG"))
-            return "Performance";
-        if (key.contains("Texture") || key.contains("FRM") || key.contains("Grass") ||
-            key.contains("Render") || key.contains("Sky") || key.contains("Light") ||
-            key.contains("Voxel") || key.contains("MSAA"))
-            return "Graphics";
-        if (key.contains("Network") || key.contains("Tick") || key.contains("Ping") ||
-            key.contains("Bandwidth") || key.contains("Latency"))
-            return "Network";
-        if (key.contains("Telemetry") || key.contains("Debug"))
-            return "Debug";
-        return "Other";
-    };
-    
-    for (auto it = flags.begin(); it != flags.end(); ++it) {
-        int row = ui->ffTable->rowCount();
-        ui->ffTable->insertRow(row);
-        ui->ffTable->setItem(row, 0, new QTableWidgetItem(it.key()));
-        ui->ffTable->setItem(row, 1, new QTableWidgetItem(it.value()));
-        ui->ffTable->setItem(row, 2, new QTableWidgetItem(category(it.key())));
-    }
-}
 
-void MainWindow::applySingleFlagToUI(const QString &key, const QString &value)
-{
-    // FPS
-    if (key == "DFIntTaskSchedulerTargetFps") {
-        bool ok = false;
-        int v = value.toInt(&ok);
-        if (ok && v > 0) {
-            if (auto *ts = qobject_cast<ToggleSwitch*>(ui->unlockFpsCheck))
-                ts->setCheckedVisual(true);
-            ui->targetFpsSpin2->setValue(v);
-            ui->targetFpsSpin->setValue(v);
-        }
-    }
-    // CSG / Shadows
-    else if (key == "DFIntCSGLevelOfDetailSwitchingDistance") {
-        bool ok = false;
-        int v = value.toInt(&ok);
-        if (ok) {
-            ui->csgLodSpin->setValue(v);
-            if (auto *ts = qobject_cast<ToggleSwitch*>(ui->shadowsCheck))
-                ts->setCheckedVisual(v == 0);
-        }
-    }
-    // FRM Quality
-    else if (key == "DFIntDebugFRMQualityLevelOverride") {
-        bool ok = false;
-        int v = value.toInt(&ok);
-        if (ok) {
-            ui->frmQualitySpin->setValue(v);
-            if (auto *ts = qobject_cast<ToggleSwitch*>(ui->postFxCheck))
-                ts->setCheckedVisual(v == 1);
-        }
-    }
-    // Texture Quality
-    else if (key == "DFIntTextureQualityOverride") {
-        bool ok = false;
-        int v = value.toInt(&ok);
-        if (ok && v >= 0 && v <= 3) {
-            ui->texQualityCombo->setCurrentIndex(v);
-        }
-    }
-    // Grass
-    else if (key == "FIntFRMMaxGrassDistance") {
-        bool ok = false;
-        int v = value.toInt(&ok);
-        if (ok) {
-            if (v == 0) {
-                if (auto *ts = qobject_cast<ToggleSwitch*>(ui->grassCheck))
-                    ts->setCheckedVisual(true);
-                ui->renderDistCombo->setCurrentIndex(0);
-            } else if (v == 500) {
-                if (auto *ts = qobject_cast<ToggleSwitch*>(ui->grassCheck))
-                    ts->setCheckedVisual(false);
-                ui->renderDistCombo->setCurrentIndex(1);
-            } else if (v == 1000) {
-                if (auto *ts = qobject_cast<ToggleSwitch*>(ui->grassCheck))
-                    ts->setCheckedVisual(false);
-                ui->renderDistCombo->setCurrentIndex(2);
-            }
-        }
-    }
-    // Gray Sky
-    else if (key == "FFlagDebugSkyGray") {
-        if (auto *ts = qobject_cast<ToggleSwitch*>(ui->skyGrayCheck))
-            ts->setCheckedVisual(value == "true");
-    }
-    // AA
-    else if (key == "FIntDebugForceMSAASamples") {
-        if (auto *ts = qobject_cast<ToggleSwitch*>(ui->aaCheck))
-            ts->setCheckedVisual(value == "1");
-    }
-}
 
