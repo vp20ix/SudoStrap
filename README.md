@@ -80,50 +80,30 @@ Built with **C++17** and **Qt6**, SudoStrap offers a smooth, native Linux experi
 
 ### Requirements
 
-- **Linux** (Fedora, Ubuntu, Arch, etc.)
-- **Sober** installed — Download from sober.vinegarhq.org
-- **Qt6** runtime libraries
+- **Linux** (any modern distribution)
+- **[Sober](https://sober.vinegarhq.org)** installed via Flatpak
+- **git**
 
-### Quick Install (Fedora)
+### Clone & Build
 
-    sudo dnf install qt6-qtbase qt6-qtsvg
-
-### Ubuntu / Debian
-
-    sudo apt install libqt6widgets6 libqt6svg6
-
-### Arch Linux
-
-    sudo pacman -S qt6-base qt6-svg
-
----
-
-## 🛠️ Building from Source
-
-### 1. Install Dependencies
-
-**Fedora:**
-
-    sudo dnf install cmake ninja-build gcc-c++ qt6-qtbase-devel qt6-qtsvg-devel
-
-**Ubuntu / Debian:**
-
-    sudo apt install cmake ninja-build g++ qt6-base-dev qt6-svg-dev
-
-**Arch Linux:**
-
-    sudo pacman -S cmake ninja gcc qt6-base qt6-svg
-
-### 2. Clone and Build
+Open a terminal and run:
 
     git clone https://github.com/vp20ix/SudoStrap.git
     cd SudoStrap
-    cmake -S . -B build -G Ninja
-    cmake --build build
+    ./build.sh
 
-### 3. Run
+The `build.sh` script will automatically:
+
+- Detect your distribution (Fedora / Ubuntu / Arch / openSUSE)
+- Install required dependencies (CMake, Ninja, Qt6)
+- Build SudoStrap
+- Install `style.qss` to `~/.local/share/sudostrap/`
+
+### Run
 
     ./build/SudoStrap
+
+That's it.
 
 ---
 
