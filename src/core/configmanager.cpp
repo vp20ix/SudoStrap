@@ -166,11 +166,17 @@ bool ConfigManager::save()
     // Update use_opengl
     root["use_opengl"] = m_useOpenGL;
 
-    // Build fflags object from our map
+    // Build fflags object — MERGE with existing (don't replace!)
     QJsonObject ff;
+    
+    // 1. احتفظ بالفلاغات الموجودة (من Sober أو إعدادات سابقة)
+    if (root.contains("fflags") && root["fflags"].isObject()) {
+        ff = root["fflags"].toObject();
+    }
+    
+    // 2. حدّث/أضف فلاغاتنا فوقها
     for (auto it = m_flags.begin(); it != m_flags.end(); ++it) {
         const QString &v = it.value();
-        // Try to preserve type: numbers, booleans, strings
         if (v == "true" || v == "false") {
             ff[it.key()] = (v == "true");
         } else {
