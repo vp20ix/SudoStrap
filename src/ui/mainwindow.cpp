@@ -387,6 +387,37 @@ void MainWindow::syncConfigToUI()
         m_config.removeFlag("FFlagDebugSkyGray");
     }
 
+    // ---- Lighting Mode ----
+    {
+        int li = ui->lightingCombo->currentIndex();
+        if (li == 0) {
+            m_config.setFlag("DFFlagDebugRenderForceTechnologyVoxel", "True");
+            m_config.removeFlag("FFlagRenderFutureLighting");
+        } else if (li == 1) {
+            m_config.removeFlag("DFFlagDebugRenderForceTechnologyVoxel");
+            m_config.setFlag("FFlagRenderShadowMapLighting", "True");
+        } else if (li == 2) {
+            m_config.removeFlag("DFFlagDebugRenderForceTechnologyVoxel");
+            m_config.setFlag("FFlagRenderFutureLighting", "True");
+        }
+    }
+
+    // ---- Graphics API (Vulkan vs OpenGL) ----
+    {
+        int gi = ui->gfxApiCombo->currentIndex();
+        // 0 = Vulkan (default), 1 = OpenGL
+        m_config.setUseOpenGL(gi == 1);
+    }
+
+    // ---- Bloom ----
+    if (ui->bloomCheck->isChecked()) {
+        m_config.setFlag("FFlagRenderBloom3", "False");
+        m_config.setFlag("FFlagDisablePostFx", "True");
+    } else {
+        m_config.removeFlag("FFlagRenderBloom3");
+        m_config.removeFlag("FFlagDisablePostFx");
+    }
+
     // ---- Network / Ping Boost ----
     if (ui->pingBoostCheck->isChecked()) {
         m_config.setFlag("DFIntSendMovementRateHz", "60");
@@ -816,6 +847,31 @@ void MainWindow::syncConfigToUI_Load()
 
     QString sky = m_config.getFlag("FFlagDebugSkyGray");
     setToggle(ui->skyGrayCheck, sky == "true");
+
+    // ---- Lighting Mode ----
+    {
+        QString voxel = m_config.getFlag("DFFlagDebugRenderForceTechnologyVoxel");
+        QString shadow = m_config.getFlag("FFlagRenderShadowMapLighting");
+        QString future = m_config.getFlag("FFlagRenderFutureLighting");
+        if (future == "True" || future == "true") {
+            setCombo(ui->lightingCombo, 2);
+        } else if (shadow == "True" || shadow == "true") {
+            setCombo(ui->lightingCombo, 1);
+        } else if (voxel == "True" || voxel == "true") {
+            setCombo(ui->lightingCombo, 0);
+        } else {
+            setCombo(ui->lightingCombo, 0);  // default Voxel
+        }
+    }
+
+    // ---- Graphics API ----
+    setCombo(ui->gfxApiCombo, m_config.useOpenGL() ? 1 : 0);
+
+    // ---- Bloom ----
+    {
+        QString bloom = m_config.getFlag("FFlagRenderBloom3");
+        setToggle(ui->bloomCheck, bloom == "False" || bloom == "false");
+    }
 
     // ---- Ping Boost ----
     QString pingFlag = m_config.getFlag("DFIntSendMovementRateHz");
