@@ -49,6 +49,11 @@ MainWindow::MainWindow(QWidget *parent)
 {
 
     ui->setupUi(this);
+    // إخفاء كرت التحديث التلقائي القديم (لأنه صار في الفوتر)
+    if (ui->setTitleUpdate && ui->setTitleUpdate->parentWidget()) {
+        ui->setTitleUpdate->parentWidget()->setVisible(false);
+    }
+
     QLabel *appLogo = ui->brandLogo;
     ui->appTitle->setStyleSheet("padding: 0; background: transparent; border: none;");
 
