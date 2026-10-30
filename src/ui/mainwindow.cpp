@@ -115,6 +115,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->saveButton->setEnabled(false);
 
     installGlow(ui->launchButton, QColor(0, 120, 212), 24);
+    ui->launchButton->setStyleSheet(
+        "QPushButton { background-color: #0078d4; color: #ffffff; border: 1px solid #0078d4; "
+        "padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; }"
+        "QPushButton:hover { background-color: #1084d8; border-color: #1084d8; }"
+        "QPushButton:pressed { background-color: #005a9e; border-color: #005a9e; }"
+    );
     installGlow(ui->saveButton,   QColor(34, 211, 238), 24);
     installGlow(ui->closeButton,  QColor(255, 90, 90), 24);
     installGlow(ui->resetButton,  QColor(240, 160, 80), 24);

@@ -2,19 +2,17 @@
 #define CONFIGMANAGER_H
 
 #include <QString>
-#include <QJsonObject>
-#include <QJsonDocument>
 #include <QMap>
 
 class ConfigManager
 {
 public:
-    ConfigManager();
+    ConfigManager() = default;
 
     // Paths
-    static QString configPath();
-    static QString profilePath();
-    static QString backupDir();
+    static const QString &configPath();
+    static const QString &profilePath();
+    static const QString &backupDir();
 
     // Reading
     bool load();
@@ -42,7 +40,7 @@ public:
     void applyBalancedPreset();
     void applyHighEndPreset();
 
-    QString lastError() const { return m_lastError; }
+    const QString &lastError() const { return m_lastError; }
 
 private:
     QMap<QString, QString> m_flags;

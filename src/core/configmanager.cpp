@@ -1,52 +1,109 @@
 #include "core/configmanager.h"
 #include <QFile>
 #include <QDir>
-#include <QDateTime>
-#include <QStandardPaths>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonParseError>
+#include <QJsonValue>
 #include <QSaveFile>
 
-ConfigManager::ConfigManager() {}
+namespace {
 
-QString ConfigManager::configPath()
+const QString &homeDirectory()
 {
-    return QDir::homePath() +
-           "/.var/app/org.vinegarhq.Sober/config/sober/config.json";
+    static const QString path = QDir::homePath();
+    return path;
 }
 
-QString ConfigManager::profilePath()
+const QString &soberConfigPath()
 {
-    return QDir::homePath() + "/.config/SudoStrap/profile.json";
+    static const QString path = homeDirectory() + QStringLiteral("/.var/app/org.vinegarhq.Sober/config/sober/config.json");
+    return path;
+}
+
+const QString &sudostrapConfigDirectory()
+{
+    static const QString path = homeDirectory() + QStringLiteral("/.config/SudoStrap");
+    return path;
+}
+
+const QString &sudostrapProfilePath()
+{
+    static const QString path = sudostrapConfigDirectory() + QStringLiteral("/profile.json");
+    return path;
+}
+
+const QString &sudostrapBackupDirectory()
+{
+    static const QString path = sudostrapConfigDirectory() + QStringLiteral("/backups");
+    return path;
+}
+
+QJsonValue jsonValueForFlag(const QString &value)
+{
+    if (value == QLatin1String("true")) return true;
+    if (value == QLatin1String("false")) return false;
+
+    bool ok = false;
+    const double number = value.toDouble(&ok);
+    if (!ok) return value;
+
+    if (!value.contains(QLatin1Char('.')) &&
+        !value.contains(QLatin1Char('e')) &&
+        !value.contains(QLatin1Char('E'))) {
+        return static_cast<int>(number);
+    }
+    return number;
+}
+
+} // namespace
+
+const QString &ConfigManager::configPath()
+{
+    return soberConfigPath();
+}
+
+const QString &ConfigManager::profilePath()
+{
+    return sudostrapProfilePath();
 }
 
 bool ConfigManager::saveProfile()
 {
+    m_lastError.clear();
+
     QJsonObject root;
     QJsonObject ff;
-    
-    for (auto it = m_flags.begin(); it != m_flags.end(); ++it) {
-        const QString &v = it.value();
-        if (v == "true" || v == "false") {
-            ff[it.key()] = (v == "true");
-        } else {
-            bool ok = false;
-            double num = v.toDouble(&ok);
-            if (ok && !v.contains('.') && !v.contains('e')) {
-                ff[it.key()] = static_cast<int>(num);
-            } else if (ok) {
-                ff[it.key()] = num;
-            } else {
-                ff[it.key()] = v;
-            }
-        }
+
+    for (auto it = m_flags.cbegin(), end = m_flags.cend(); it != end; ++it) {
+        ff.insert(it.key(), jsonValueForFlag(it.value()));
     }
-    root["fflags"] = ff;
-    root["use_opengl"] = m_useOpenGL;
-    
-    QDir().mkpath(QFileInfo(profilePath()).absolutePath());
-    QFile f(profilePath());
-    if (!f.open(QFile::WriteOnly | QFile::Truncate)) return false;
-    f.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
-    f.close();
+
+    root.insert(QStringLiteral("fflags"), ff);
+    root.insert(QStringLiteral("use_opengl"), m_useOpenGL);
+
+    if (!QDir().mkpath(sudostrapConfigDirectory())) {
+        m_lastError = QStringLiteral("Could not create profile directory");
+        return false;
+    }
+
+    QSaveFile file(profilePath());
+    if (!file.open(QFile::WriteOnly)) {
+        m_lastError = QStringLiteral("Could not open profile for write");
+        return false;
+    }
+
+    const QByteArray json = QJsonDocument(root).toJson(QJsonDocument::Compact);
+    if (file.write(json) != json.size()) {
+        m_lastError = QStringLiteral("Could not write profile");
+        file.cancelWriting();
+        return false;
+    }
+    if (!file.commit()) {
+        m_lastError = QStringLiteral("Could not commit profile");
+        return false;
+    }
+
     return true;
 }
 
@@ -56,17 +113,19 @@ bool ConfigManager::loadProfile()
     if (!f.exists()) return false;
     if (!f.open(QFile::ReadOnly)) return false;
     
-    QJsonDocument doc = QJsonDocument::fromJson(f.readAll());
+    const QJsonDocument doc = QJsonDocument::fromJson(f.readAll());
     f.close();
     
-    QJsonObject root = doc.object();
-    if (!root.contains("fflags")) return false;
+    const QJsonObject root = doc.object();
+    const QJsonValue flagsValue = root.value(QStringLiteral("fflags"));
+    if (!flagsValue.isObject()) return false;
     
     m_flags.clear();
-    if (root.contains("use_opengl")) m_useOpenGL = root["use_opengl"].toBool();
+    const QJsonValue openGLValue = root.value(QStringLiteral("use_opengl"));
+    if (!openGLValue.isUndefined()) m_useOpenGL = openGLValue.toBool();
     
-    QJsonObject ff = root["fflags"].toObject();
-    for (auto it = ff.begin(); it != ff.end(); ++it) {
+    const QJsonObject ff = flagsValue.toObject();
+    for (auto it = ff.constBegin(), end = ff.constEnd(); it != end; ++it) {
         QString val;
         if (it.value().isString()) val = it.value().toString();
         else if (it.value().isBool()) val = it.value().toBool() ? "true" : "false";
@@ -85,9 +144,9 @@ bool ConfigManager::restoreFromProfile()
     return save();
 }
 
-QString ConfigManager::backupDir()
+const QString &ConfigManager::backupDir()
 {
-    QString dir = QDir::homePath() + "/.config/SudoStrap/backups";
+    const QString &dir = sudostrapBackupDirectory();
     QDir().mkpath(dir);
     return dir;
 }
@@ -113,27 +172,25 @@ bool ConfigManager::load()
         return false;
     }
 
-    QByteArray data = f.readAll();
-    f.close();
-
     QJsonParseError err;
-    QJsonDocument doc = QJsonDocument::fromJson(data, &err);
+    const QJsonDocument doc = QJsonDocument::fromJson(f.readAll(), &err);
+    f.close();
     if (err.error != QJsonParseError::NoError) {
         m_lastError = "Invalid JSON: " + err.errorString();
         return false;
     }
 
-    QJsonObject root = doc.object();
+    const QJsonObject root = doc.object();
 
     // Read use_opengl
-    if (root.contains("use_opengl")) {
-        m_useOpenGL = root["use_opengl"].toBool();
-    }
+    const QJsonValue openGLValue = root.value(QStringLiteral("use_opengl"));
+    if (!openGLValue.isUndefined()) m_useOpenGL = openGLValue.toBool();
 
     // Read fflags
-    if (root.contains("fflags") && root["fflags"].isObject()) {
-        QJsonObject ff = root["fflags"].toObject();
-        for (auto it = ff.begin(); it != ff.end(); ++it) {
+    const QJsonValue flagsValue = root.value(QStringLiteral("fflags"));
+    if (flagsValue.isObject()) {
+        const QJsonObject ff = flagsValue.toObject();
+        for (auto it = ff.constBegin(), end = ff.constEnd(); it != end; ++it) {
             QString val;
             if (it.value().isString())       val = it.value().toString();
             else if (it.value().isBool())    val = it.value().toBool() ? "true" : "false";
@@ -154,44 +211,31 @@ bool ConfigManager::save()
     QJsonObject root;
 
     // Preserve existing file content
-    if (configExists()) {
-        QFile rf(configPath());
-        if (rf.open(QFile::ReadOnly)) {
-            QJsonDocument existing = QJsonDocument::fromJson(rf.readAll());
+    {
+        QFile existingFile(configPath());
+        if (existingFile.open(QFile::ReadOnly)) {
+            const QJsonDocument existing = QJsonDocument::fromJson(existingFile.readAll());
             if (existing.isObject()) root = existing.object();
-            rf.close();
         }
     }
 
     // Update use_opengl
-    root["use_opengl"] = m_useOpenGL;
+    root.insert(QStringLiteral("use_opengl"), m_useOpenGL);
 
     // Build fflags object — MERGE with existing (don't replace!)
     QJsonObject ff;
     
     // 1. احتفظ بالفلاغات الموجودة (من Sober أو إعدادات سابقة)
-    if (root.contains("fflags") && root["fflags"].isObject()) {
-        ff = root["fflags"].toObject();
+    const QJsonValue existingFlags = root.value(QStringLiteral("fflags"));
+    if (existingFlags.isObject()) {
+        ff = existingFlags.toObject();
     }
     
     // 2. حدّث/أضف فلاغاتنا فوقها
-    for (auto it = m_flags.begin(); it != m_flags.end(); ++it) {
-        const QString &v = it.value();
-        if (v == "true" || v == "false") {
-            ff[it.key()] = (v == "true");
-        } else {
-            bool ok = false;
-            double num = v.toDouble(&ok);
-            if (ok && !v.contains('.') && !v.contains('e') && !v.contains('E')) {
-                ff[it.key()] = static_cast<int>(num);
-            } else if (ok) {
-                ff[it.key()] = num;
-            } else {
-                ff[it.key()] = v;
-            }
-        }
+    for (auto it = m_flags.cbegin(), end = m_flags.cend(); it != end; ++it) {
+        ff.insert(it.key(), jsonValueForFlag(it.value()));
     }
-    root["fflags"] = ff;
+    root.insert(QStringLiteral("fflags"), ff);
 
     // Write atomically (QSaveFile handles temp + rename)
     QSaveFile sf(configPath());
@@ -199,7 +243,12 @@ bool ConfigManager::save()
         m_lastError = "Could not open file for write";
         return false;
     }
-    sf.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
+    const QByteArray json = QJsonDocument(root).toJson(QJsonDocument::Compact);
+    if (sf.write(json) != json.size()) {
+        m_lastError = "Could not write file";
+        sf.cancelWriting();
+        return false;
+    }
     if (!sf.commit()) {
         m_lastError = "Could not commit file";
         return false;
@@ -221,7 +270,8 @@ void ConfigManager::removeFlag(const QString &key)
 
 QString ConfigManager::getFlag(const QString &key) const
 {
-    return m_flags.value(key, QString());
+    const auto it = m_flags.constFind(key);
+    return it == m_flags.cend() ? QString() : it.value();
 }
 
 void ConfigManager::clearFlags()
