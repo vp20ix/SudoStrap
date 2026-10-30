@@ -8,6 +8,7 @@
 #include <QStandardPaths>
 #include <QGraphicsDropShadowEffect>
 #include <QPropertyAnimation>
+#include <QPixmap>
 
 LaunchDialog::LaunchDialog(QWidget *parent, QPointer<QProcess> process)
     : QDialog(parent), m_process(process), pendingProgress(0), launchStarted(false)
@@ -35,15 +36,16 @@ LaunchDialog::LaunchDialog(QWidget *parent, QPointer<QProcess> process)
     layout->setContentsMargins(30, 28, 30, 28);
     layout->setSpacing(14);
 
-    iconLabel = new QLabel("⚡", mainWidget);
-    iconLabel->setAlignment(Qt::AlignCenter);
-    iconLabel->setStyleSheet("font-size: 36px; background: transparent;");
-    layout->addWidget(iconLabel);
-
-    auto *title = new QLabel("SudoStrap", mainWidget);
+    auto *title = new QLabel(mainWidget);
+    title->setObjectName("launchLogo");
+    title->setFixedSize(200, 62);
     title->setAlignment(Qt::AlignCenter);
-    title->setStyleSheet("color: #ffffff; font-size: 18px; font-weight: bold; letter-spacing: 1px; background: transparent;");
-    layout->addWidget(title);
+    title->setStyleSheet("background: transparent;");
+    const QPixmap logo(QStringLiteral(":/icons/logo_banner.png"));
+    if (!logo.isNull()) {
+        title->setPixmap(logo.scaled(title->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    }
+    layout->addWidget(title, 0, Qt::AlignHCenter);
 
     auto *subtitle = new QLabel("Preparing Roblox for Linux", mainWidget);
     subtitle->setAlignment(Qt::AlignCenter);

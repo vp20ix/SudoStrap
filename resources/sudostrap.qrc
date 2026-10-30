@@ -1,6 +1,8 @@
 <RCC>
     <qresource prefix="/icons">
         <file alias="logo.png">icons/logo.png</file>
+        <file alias="sudostraplogo.png">icons/sudostraplogo.png</file>
+        <file alias="logo_banner.png">icons/logo_banner.png</file>
         <file alias="toggle_on.svg">icons/toggle_on.svg</file>
         <file alias="toggle_off.svg">icons/toggle_off.svg</file>
         <file alias="arrow_up.svg">icons/arrow_up.svg</file>

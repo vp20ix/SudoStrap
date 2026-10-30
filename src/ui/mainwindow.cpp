@@ -49,14 +49,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
 
     ui->setupUi(this);
-    QLabel *appLogo = new QLabel(this);
-    appLogo->setObjectName("appLogo");
-    appLogo->setFixedSize(36, 36);
-    if (ui->navSectionLabel && ui->navSectionLabel->parentWidget()) {
-        if (auto *boxLay = qobject_cast<QBoxLayout*>(ui->navSectionLabel->parentWidget()->layout())) {
-            boxLay->insertWidget(0, appLogo);
-        }
-    }
+    QLabel *appLogo = ui->brandLogo;
+    ui->appTitle->setStyleSheet("padding: 0; background: transparent; border: none;");
 
 
     // Setup Update Button
@@ -71,7 +65,7 @@ MainWindow::MainWindow(QWidget *parent)
     QTimer::singleShot(600, this, &MainWindow::checkForUpdatesInBackground);
 
 
-    const QPixmap logoSource(QStringLiteral(":/icons/logo.png"));
+    const QPixmap logoSource(QStringLiteral(":/icons/sudostraplogo.png"));
     const int logoSide = logoSource.height();
     const QPixmap brandLogo = logoSource.isNull()
         ? QPixmap()

@@ -35,6 +35,7 @@ set(SOURCES
     src/ui/updatechecker.cpp
     src/ui/whatsnewdialog.cpp
     src/core/configmanager.cpp
+    resources/sudostrap.qrc
 )
 
 set(HEADERS

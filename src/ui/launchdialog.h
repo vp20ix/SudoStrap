@@ -32,7 +32,6 @@ private:
 
     QProgressBar *progressBar;
     QLabel *statusLabel;
-    QLabel *iconLabel;
     QProcess *process;
     QPropertyAnimation *animation;
     int pendingProgress;
