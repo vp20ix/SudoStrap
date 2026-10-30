@@ -1,0 +1,36 @@
+#include <QApplication>
+#include <QCoreApplication>
+#include <QFile>
+#include <QDir>
+#include <QTextStream>
+#include "ui/mainwindow.h"
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+
+    QCoreApplication::setApplicationName("SudoStrap");
+    QCoreApplication::setApplicationVersion("0.1.0");
+    QCoreApplication::setOrganizationName("SudoStrap");
+
+    QString styleSheet;
+    QFile builtInStyle(QStringLiteral(":/style.qss"));
+    if (builtInStyle.open(QFile::ReadOnly | QFile::Text)) {
+        QTextStream stream(&builtInStyle);
+        styleSheet = stream.readAll();
+    }
+
+    const QString customStylePath = QDir::homePath() + "/.local/share/sudostrap/style.qss";
+    QFile customStyle(customStylePath);
+    if (customStyle.open(QFile::ReadOnly | QFile::Text)) {
+        QTextStream stream(&customStyle);
+        if (!styleSheet.isEmpty()) styleSheet += QLatin1Char('\n');
+        styleSheet += stream.readAll();
+    }
+    app.setStyleSheet(styleSheet);
+
+    MainWindow window;
+    window.show();
+
+    return app.exec();
+}

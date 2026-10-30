@@ -4,6 +4,7 @@
 #include "ui/customffdialog.h"
 #include "ui/updatedialog.h"
 #include "ui/launchdialog.h"
+#include "ui/updatechecker.h"
 
 #include <QMessageBox>
 #include <QJsonParseError>
@@ -20,6 +21,9 @@
 #include <QWidget>
 #include <QAbstractItemView>
 #include <QPixmap>
+#include <QPointer>
+#include <QIcon>
+#include <QLabel>
 #include <QPainter>
 #include <QSvgRenderer>
 #include <QUrl>
@@ -28,12 +32,14 @@
 #include <QComboBox>
 #include <QSpinBox>
 #include <QPushButton>
+#include <QBoxLayout>
 #include <QPropertyAnimation>
 #include <QEvent>
 #include <QGraphicsDropShadowEffect>
 #include <QColor>
 #include <QTimer>
 #include <QProcess>
+#include <QSettings>
 #include <QStandardPaths>
 #include <QDir>
 #include <QStringList>
@@ -43,9 +49,51 @@ MainWindow::MainWindow(QWidget *parent)
 {
 
     ui->setupUi(this);
+    QLabel *appLogo = new QLabel(this);
+    appLogo->setObjectName("appLogo");
+    appLogo->setFixedSize(36, 36);
+    if (ui->navSectionLabel && ui->navSectionLabel->parentWidget()) {
+        if (auto *boxLay = qobject_cast<QBoxLayout*>(ui->navSectionLabel->parentWidget()->layout())) {
+            boxLay->insertWidget(0, appLogo);
+        }
+    }
+
+
+    // Setup Update Button
+    m_updateBtn = new QPushButton(QString::fromUtf8("\u2B06 Update"), this);
+    m_updateBtn->setVisible(false);
+    m_updateBtn->setCursor(Qt::PointingHandCursor);
+    m_updateBtn->setStyleSheet("background:#0078d4; color:white; border-radius:11px; padding:4px 12px; font-weight:bold; font-size:11px;");
+    if (ui->statusChip && ui->statusChip->parentWidget() && ui->statusChip->parentWidget()->layout()) {
+        ui->statusChip->parentWidget()->layout()->addWidget(m_updateBtn);
+    }
+    connect(m_updateBtn, &QPushButton::clicked, this, &MainWindow::onUpdateBtnClicked);
+    QTimer::singleShot(600, this, &MainWindow::checkForUpdatesInBackground);
+
+
+    const QPixmap logoSource(QStringLiteral(":/icons/logo.png"));
+    const int logoSide = logoSource.height();
+    const QPixmap brandLogo = logoSource.isNull()
+        ? QPixmap()
+        : logoSource.copy((logoSource.width() - logoSide) / 2, 0, logoSide, logoSide);
+    if (!brandLogo.isNull()) {
+        appLogo->setPixmap(brandLogo.scaled(36, 36, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        ui->abtLogo->setPixmap(brandLogo.scaled(96, 96, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        setWindowIcon(QIcon(brandLogo));
+    }
+    appLogo->setAlignment(Qt::AlignCenter);
+
+    for (QLabel *icon : {ui->icon1, ui->icon2, ui->icon3, ui->icon4, ui->icon5,
+                         ui->gicon1, ui->gicon2, ui->gicon3, ui->gicon4,
+                         ui->gicon5, ui->gicon6, ui->gicon7,
+                         ui->fficon1, ui->fficon2, ui->fficon3}) {
+        icon->setAlignment(Qt::AlignCenter);
+    }
 
     m_autoUpdateEnabled = false;
     m_activePreset = -1;
+    m_showAfterRobloxCloses = QSettings().value("showAfterRobloxCloses", false).toBool();
+    ui->setToggleStartup->setCheckedVisual(m_showAfterRobloxCloses);
 
     // ============ Fix ComboBox popup ============
     auto styleComboPopup = [](QComboBox *combo) {
@@ -72,7 +120,7 @@ MainWindow::MainWindow(QWidget *parent)
     
     ui->saveButton->setEnabled(false);
 
-    installGlow(ui->launchButton, QColor(0, 120, 212), 32);
+    installGlow(ui->launchButton, QColor(0, 120, 212), 24);
     installGlow(ui->saveButton,   QColor(34, 211, 238), 24);
     installGlow(ui->closeButton,  QColor(255, 90, 90), 24);
     installGlow(ui->resetButton,  QColor(240, 160, 80), 24);
@@ -151,6 +199,7 @@ MainWindow::MainWindow(QWidget *parent)
                     static_cast<QObject*>(ui->aaCheck), static_cast<QObject*>(ui->bloomCheck),
                     static_cast<QObject*>(ui->skyGrayCheck), static_cast<QObject*>(ui->renderDistCombo),
                     static_cast<QObject*>(ui->texQualityCombo), static_cast<QObject*>(ui->lightingCombo),
+                    static_cast<QObject*>(ui->gfxApiCombo),
                     static_cast<QObject*>(ui->targetFpsSpin), static_cast<QObject*>(ui->targetFpsSpin2),
                     static_cast<QObject*>(ui->csgLodSpin), static_cast<QObject*>(ui->frmQualitySpin)}) {
         connectDirty(w);
@@ -274,8 +323,11 @@ MainWindow::MainWindow(QWidget *parent)
         m_autoUpdateEnabled = on;
         markDirty();
     });
-    connect(ui->setToggleStartup, &QAbstractButton::toggled, this, [this](bool) {
-        markDirty();
+    connect(ui->setToggleStartup, &QAbstractButton::toggled, this, [this](bool enabled) {
+        m_showAfterRobloxCloses = enabled;
+        QSettings settings;
+        settings.setValue("showAfterRobloxCloses", enabled);
+        settings.sync();
     });
     connect(ui->setLangCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &MainWindow::onLanguageChanged);
@@ -454,16 +506,53 @@ void MainWindow::onCloseClicked() { close(); }
 void MainWindow::onLaunchClicked() {
     // ← استرجع إعداداتك من profile.json قبل تشغيل Sober
     if (m_config.loadProfile()) {
-        m_config.save();  // اكتبها في config.json
+        if (!m_config.save()) {
+            QMessageBox::warning(this, "Restore Failed", m_config.lastError());
+            return;
+        }
         setStatus("Settings restored");
     }
     
+    if (m_showAfterRobloxCloses) {
+        if (m_soberProcess && m_soberProcess->state() != QProcess::NotRunning) return;
+        m_soberProcess = new QProcess(this);
+        QPointer<QProcess> process(m_soberProcess);
+        connect(process, &QProcess::finished, this,
+                [this, process](int, QProcess::ExitStatus) {
+            if (m_soberProcess == process) m_soberProcess = nullptr;
+            process->deleteLater();
+            if (m_showAfterRobloxCloses && isHidden()) {
+                showNormal();
+                raise();
+                activateWindow();
+            }
+        });
+        connect(process, &QProcess::errorOccurred, this,
+                [this, process](QProcess::ProcessError error) {
+            if (error != QProcess::FailedToStart) return;
+            if (m_soberProcess == process) m_soberProcess = nullptr;
+            process->deleteLater();
+        });
+
+        LaunchDialog dlg(this, process);
+        bool launched = false;
+        connect(&dlg, &LaunchDialog::launchFinished, this,
+                [&launched](bool success) { launched = success; });
+        dlg.startLaunch();
+        dlg.exec();
+
+        if (launched && process && process->state() != QProcess::NotRunning) hide();
+        return;
+    }
+
     LaunchDialog dlg(this);
+    bool launched = false;
+    connect(&dlg, &LaunchDialog::launchFinished, this,
+            [&launched](bool success) { launched = success; });
     dlg.startLaunch();
     dlg.exec();
     
-    // بعد ما ينتهي الـ Dialog، أغلق البرنامج الرئيسي
-    close();
+    if (launched) close();
 }
 
 
@@ -509,16 +598,15 @@ void MainWindow::onResetClicked()
     // Clear ALL flags in memory
     m_config.clearFlags();
 
-    // Delete config file
-    QString configPath = QDir::homePath() +
-        "/.var/app/org.vinegarhq.Sober/config/sober/config.json";
-
-    if (QFile::exists(configPath)) {
-        QFile::remove(configPath);
+    // Persist reset values atomically and update the profile used at launch.
+    if (!m_config.save()) {
+        QMessageBox::warning(this, "Reset Failed", m_config.lastError());
+        return;
     }
-
-    // Write only defaults (no flags)
-    m_config.save();
+    if (!m_config.saveProfile()) {
+        QMessageBox::warning(this, "Profile Reset Failed", m_config.lastError());
+        return;
+    }
     setStatus("Reset to defaults");
     QTimer::singleShot(2000, this, [this]() { setStatus("Ready"); });
 }
@@ -526,42 +614,78 @@ void MainWindow::onResetClicked()
 
 void MainWindow::onSaveClicked()
 {
-    // Check if Sober is running
-    QProcess check;
-    check.start("flatpak", {"ps"});
-    check.waitForFinished(1500);
-    QString output = QString::fromUtf8(check.readAllStandardOutput());
-    bool soberRunning = output.contains("org.vinegarhq.Sober");
+    if (m_saveInProgress) return;
+    m_saveInProgress = true;
+    ui->saveButton->setEnabled(false);
+    setStatus("Checking Sober...");
 
-    if (soberRunning) {
-        QMessageBox::warning(this, "Sober is Running",
-            "Sober is currently running. Saving settings now may "
-            "cause Roblox to crash or close.\n\n"
-            "Please close Sober first, then save again.");
-        return;
-    }
+    auto *check = new QProcess(this);
+    auto finishSave = [this, check](bool canSave, const QString &error = QString()) {
+        if (!m_saveInProgress) return;
+        m_saveInProgress = false;
+        check->deleteLater();
+        if (!canSave) {
+            ui->saveButton->setEnabled(m_dirty);
+            setStatus("Save cancelled");
+            if (!error.isEmpty()) QMessageBox::warning(this, "Save Check Failed", error);
+            else QMessageBox::warning(this, "Sober is Running",
+                "Sober is currently running. Saving settings now may "
+                "cause Roblox to crash or close.\n\n"
+                "Please close Sober first, then save again.");
+            return;
+        }
 
-    setStatus("Saving...");
-    showProgress(0);
-    QTimer::singleShot(200, this, [this]() { showProgress(50); });
+        setStatus("Saving...");
+        showProgress(0);
+        QTimer::singleShot(200, this, [this]() { showProgress(50); });
+        QTimer::singleShot(500, this, [this]() {
+            syncConfigToUI();
+            if (m_config.save()) {
+                if (!m_config.saveProfile()) {
+                    QMessageBox::warning(this, "Profile Save Failed", m_config.lastError());
+                }
+                showProgress(100);
+                setStatus("Saved OK");
+                resetDirty();
+                QTimer::singleShot(700, this, [this]() { hideProgress(); });
+                QTimer::singleShot(2400, this, [this]() { setStatus("Ready"); });
+            } else {
+                hideProgress();
+                setStatus("Save failed");
+                QMessageBox::warning(this, "Save Failed", m_config.lastError());
+                QTimer::singleShot(3000, this, [this]() { setStatus("Ready"); });
+            }
+        });
+    };
 
-    QTimer::singleShot(500, this, [this]() {
-        syncConfigToUI();
-
-        if (m_config.save()) {
-            m_config.saveProfile();  // ← احفظ نسخة خاصة
-            showProgress(100);
-            setStatus("Saved OK");
-            resetDirty();
-            QTimer::singleShot(700, this, [this]() { hideProgress(); });
-            QTimer::singleShot(2400, this, [this]() { setStatus("Ready"); });
-        } else {
-            hideProgress();
-            setStatus("Save failed");
-            QMessageBox::warning(this, "Save Failed", m_config.lastError());
-            QTimer::singleShot(3000, this, [this]() { setStatus("Ready"); });
+    connect(check, &QProcess::finished, this,
+            [check, finishSave](int exitCode, QProcess::ExitStatus exitStatus) {
+        if (!check->property("handled").toBool()) {
+            check->setProperty("handled", true);
+            if (exitStatus != QProcess::NormalExit || exitCode != 0) {
+                finishSave(false, "Could not check whether Sober is running.");
+                return;
+            }
+            const QString output = QString::fromUtf8(check->readAllStandardOutput());
+            finishSave(!output.contains("org.vinegarhq.Sober"));
         }
     });
+    connect(check, &QProcess::errorOccurred, this,
+            [check, finishSave](QProcess::ProcessError error) {
+        if (error == QProcess::FailedToStart && !check->property("handled").toBool()) {
+            check->setProperty("handled", true);
+            finishSave(false, "Could not start flatpak to check Sober.");
+        }
+    });
+    QTimer::singleShot(4000, check, [check, finishSave]() {
+        if (check->state() != QProcess::NotRunning &&
+            !check->property("handled").toBool()) {
+            check->setProperty("handled", true);
+            check->kill();
+            finishSave(false, "Timed out while checking whether Sober is running.");
+        }
+    });
+    check->start("flatpak", {"ps"});
 }
 
 void MainWindow::markDirty()
@@ -714,8 +838,8 @@ void MainWindow::applyLanguage(const QString &lang)
     ui->setSectionGeneral->setText(ar ? QString::fromUtf8("عام") : "GENERAL");
     ui->setTitleUpdate->setText(ar ? QString::fromUtf8("التحديث التلقائي") : "Auto-Update");
     ui->setDescUpdate->setText(ar ? QString::fromUtf8("فحص وتثبيت التحديثات تلقائياً عند البدء") : "Automatically check and install updates on startup");
-    ui->setTitleStartup->setText(ar ? QString::fromUtf8("التشغيل مع النظام") : "Launch on Startup");
-    ui->setDescStartup->setText(ar ? QString::fromUtf8("تشغيل SudoStrap تلقائياً مع النظام") : "Start SudoStrap automatically with your system");
+    ui->setTitleStartup->setText(ar ? QString::fromUtf8("إظهار SudoStrap بعد إغلاق Roblox") : "Show SudoStrap after Roblox closes");
+    ui->setDescStartup->setText(ar ? QString::fromUtf8("العودة إلى SudoStrap بعد إغلاق Roblox") : "Return to SudoStrap when Roblox closes");
     ui->setSectionLang->setText(ar ? QString::fromUtf8("اللغة") : "LANGUAGE");
     ui->setTitleLang->setText(ar ? QString::fromUtf8("لغة الواجهة") : "Interface Language");
     ui->setDescLang->setText(ar ? QString::fromUtf8("اختر لغة واجهة SudoStrap") : "Choose the language for SudoStrap interface");
@@ -737,27 +861,15 @@ void MainWindow::applyLanguage(const QString &lang)
 
 void MainWindow::syncConfigToUI_Load()
 {
-    QFile dbg("/tmp/sudostrap_debug.txt");
-    dbg.open(QFile::WriteOnly);
-    dbg.write("=== syncConfigToUI_Load called ===\n");
-
     // حاول profile أولاً، إذا ما فيه احمل من config
     bool loaded = m_config.loadProfile();
     if (!loaded) {
         loaded = m_config.load();
     }
-    dbg.write(("load() result: " + QString(loaded ? "TRUE" : "FALSE") + "\n").toUtf8());
-
     if (!loaded) {
-        dbg.write(("error: " + m_config.lastError() + "\n").toUtf8());
-        dbg.close();
         resetDirty();
         return;
     }
-
-    QString fpsCheck = m_config.getFlag("DFIntTaskSchedulerTargetFps");
-    dbg.write(("FPS flag value: [" + fpsCheck + "]\n").toUtf8());
-    dbg.close();
 
     auto setToggle = [](QAbstractButton *tg, bool on) {
         tg->blockSignals(true);
@@ -1061,3 +1173,40 @@ void MainWindow::showPresetDetails(int presetId)
 
 
 
+
+void MainWindow::checkForUpdatesInBackground()
+{
+    QDir d(QFileInfo(QCoreApplication::applicationFilePath()).absolutePath());
+    d.cdUp();
+    QString workDir = d.absolutePath();
+    auto *proc = new QProcess(this);
+    proc->setWorkingDirectory(workDir);
+    connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [this, proc, workDir](int code, QProcess::ExitStatus) {
+        proc->deleteLater();
+        if (code != 0) return;
+        QProcess q;
+        q.setWorkingDirectory(workDir);
+        q.start("git", {"rev-parse", "HEAD"});
+        q.waitForFinished(2000);
+        QString local = QString::fromUtf8(q.readAllStandardOutput()).trimmed();
+        q.start("git", {"rev-parse", "origin/main"});
+        q.waitForFinished(2000);
+        QString remote = QString::fromUtf8(q.readAllStandardOutput()).trimmed();
+        if (local.isEmpty() || remote.isEmpty() || local == remote) return;
+        m_updateBtn->setVisible(true);
+    });
+    proc->start("git", {"fetch", "origin"});
+}
+
+void MainWindow::onUpdateBtnClicked()
+{
+    UpdateChecker checker(this);
+    checker.exec();
+    if (checker.updateApplied()) {
+        QProcess::startDetached(QCoreApplication::applicationFilePath(), QStringList());
+        close();
+        QCoreApplication::quit();
+    } else {
+        m_updateBtn->setVisible(false);
+    }
+}

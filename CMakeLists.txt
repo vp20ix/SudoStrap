@@ -32,6 +32,8 @@ set(SOURCES
     src/ui/launchdialog.cpp
     src/ui/toggleswitch.cpp
     src/ui/updatedialog.cpp
+    src/ui/updatechecker.cpp
+    src/ui/whatsnewdialog.cpp
     src/core/configmanager.cpp
 )
 
@@ -41,6 +43,8 @@ set(HEADERS
     src/ui/launchdialog.h
     src/ui/toggleswitch.h
     src/ui/updatedialog.h
+    src/ui/updatechecker.h
+    src/ui/whatsnewdialog.h
     src/core/configmanager.h
 )
 

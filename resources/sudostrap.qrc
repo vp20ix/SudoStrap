@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="logo.png">icons/logo.png</file>
+        <file alias="toggle_on.svg">icons/toggle_on.svg</file>
+        <file alias="toggle_off.svg">icons/toggle_off.svg</file>
+        <file alias="arrow_up.svg">icons/arrow_up.svg</file>
+        <file alias="arrow_down.svg">icons/arrow_down.svg</file>
+        <file alias="chevron_down.svg">icons/chevron_down.svg</file>
+    </qresource>
+    <qresource prefix="/">
+        <file alias="style.qss">style.qss</file>
+    </qresource>
+</RCC>

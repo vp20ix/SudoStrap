@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QProcess>
+#include <QPointer>
 #include <QColor>
 #include "core/configmanager.h"
 
@@ -25,6 +27,10 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private slots:
+
+    void checkForUpdatesInBackground();
+    void onUpdateBtnClicked();
+
     void showPerformancePage();
     void showGraphicsPage();
     void showFastFlagsPage();
@@ -42,6 +48,13 @@ private slots:
     void onLanguageChanged(int index);
 
 private:
+
+    bool m_showAfterRobloxCloses = false;
+    bool m_saveInProgress = false;
+    QPointer<QProcess> m_soberProcess;
+    QPushButton *m_updateBtn = nullptr;
+    bool m_autoUpdateEnabled = false;
+
     void setStatus(const QString &text);
     void showProgress(int value);
     void hideProgress();
@@ -55,7 +68,6 @@ private:
 
     Ui::MainWindow *ui;
     bool m_dirty;
-    bool m_autoUpdateEnabled;
     int m_activePreset;
     ConfigManager m_config;
     QString m_currentLang;

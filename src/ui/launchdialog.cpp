@@ -9,8 +9,8 @@
 #include <QGraphicsDropShadowEffect>
 #include <QPropertyAnimation>
 
-LaunchDialog::LaunchDialog(QWidget *parent)
-    : QDialog(parent), pendingProgress(0), launchStarted(false)
+LaunchDialog::LaunchDialog(QWidget *parent, QPointer<QProcess> process)
+    : QDialog(parent), m_process(process), pendingProgress(0), launchStarted(false)
 {
     setWindowTitle("SudoStrap Bootstrapper");
     setFixedSize(480, 240);

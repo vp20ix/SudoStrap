@@ -3,6 +3,8 @@
 
 #include <QDialog>
 #include <QProcess>
+#include <QPointer>
+#include <QProcess>
 
 class QProgressBar;
 class QLabel;
@@ -12,7 +14,7 @@ class LaunchDialog : public QDialog
 {
     Q_OBJECT
 public:
-    explicit LaunchDialog(QWidget *parent = nullptr);
+    explicit LaunchDialog(QWidget *parent = nullptr, QPointer<QProcess> process = nullptr);
     ~LaunchDialog();
 
     void startLaunch();
@@ -23,6 +25,7 @@ signals:
 private slots:
 
 private:
+    QPointer<QProcess> m_process;
     void setStep(const QString &text, int value);
     void animateProgress(int targetValue);
     void finish(bool success);
