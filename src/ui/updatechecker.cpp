@@ -311,7 +311,7 @@ void UpdateChecker::runBuild()
 {
     setStage(Stage::Build);
     setStatus("Building SudoStrap…", 45);
-    appendLog("$ bash build.sh");
+    appendLog("$ bash build.sh --no-deps");
     m_state = State::Building;
     m_proc = new QProcess(this);
     m_proc->setWorkingDirectory(m_workDir);
@@ -324,7 +324,7 @@ void UpdateChecker::runBuild()
         if (chunk.contains("Building")) setStatus("Compiling sources…", 60);
         if (chunk.contains("Linking"))  setStatus("Linking binary…", 85);
     });
-    m_proc->start("bash", {"build.sh"});
+    m_proc->start("bash", {"build.sh", "--no-deps"});
 }
 
 void UpdateChecker::onProcFinished(int code)

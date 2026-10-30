@@ -13,7 +13,8 @@ else
     exit 1
 fi
 
-echo "📦 Installing dependencies for $DISTRO..."
+if [ "$1" != "--no-deps" ]; then
+    echo "📦 Installing dependencies for $DISTRO..."
 echo ""
 
 case $DISTRO in
@@ -45,6 +46,7 @@ case $DISTRO in
         exit 1
         ;;
 esac
+fi
 
 echo ""
 echo "🔨 Building SudoStrap..."
